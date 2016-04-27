@@ -4,7 +4,7 @@ module.exports = {
   entry: [
     'babel-polyfill',
     'lodash',
-    path.resolve('src/main/index')
+    path.resolve('src/index')
   ],
   output: {
     path: path.resolve('build'),
@@ -16,7 +16,7 @@ module.exports = {
       {
         test: /\.ts$/,
         loader: 'babel-loader?presets[]=es2015,presets[]=stage-0!ts-loader',
-        include: path.resolve('src/main'),
+        include: path.resolve('src'),
         exclude: /node_modules/
       }
     ],

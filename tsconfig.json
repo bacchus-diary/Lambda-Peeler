@@ -6,7 +6,7 @@
     "experimentalDecorators": true
   },
   "filesGlob": [
-    "src/main/**/*.ts",
+    "src/**/*.ts",
     "typings/main.d.ts"
   ],
   "exclude": [
