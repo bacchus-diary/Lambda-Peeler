@@ -7,7 +7,7 @@ module.exports = {
         path.resolve('spec/SampleSpec')
     ],
     output: {
-        filename: 'text.bundle.js',
+        filename: 'test.bundle.js',
         pathinfo: false // show module paths in the bundle, handy for debugging
     },
     module: {
