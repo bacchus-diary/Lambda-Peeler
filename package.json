@@ -1,0 +1,32 @@
+{
+  "name": "peeler",
+  "version": "0.0.1",
+  "description": "Build flat image from video image",
+  "main": "src/main/index.js",
+  "dependencies": {
+    "lodash": "^4.11.1",
+    "opencv": "^5.0.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.3.6",
+    "babel-core": "^6.7.7",
+    "babel-loader": "^6.2.4",
+    "babel-polyfill": "^6.7.4",
+    "babel-preset-es2015": "^6.6.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-connect": "^3.2.3",
+    "gulp-typings": "^1.3.4",
+    "gulp-watch": "^4.3.5",
+    "gulp-webpack": "^1.5.0",
+    "ts-loader": "^0.8.2",
+    "typescript": "^1.8.7",
+    "webpack": "^1.13.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kunio Sawatani",
+  "license": "GPL-3.0"
+}
