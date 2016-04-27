@@ -3,6 +3,7 @@
   "version": false,
   "dependencies": {},
   "ambientDependencies": {
+    "jasmine": "registry:dt/jasmine#2.2.0+20160412134438",
     "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash.d.ts#fc4a666145cc02bfb858d4b670f9a4d9dd070191"
   }
 }

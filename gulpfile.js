@@ -1,25 +1,39 @@
 var gulp = require('gulp'),
 del = require('del'),
+ts = require('gulp-typescript'),
+jasmine = require('gulp-jasmine'),
 typings = require('gulp-typings'),
 webpack = require('gulp-webpack');
 
-webpackConfig = require('./webpack.config.js');
-webpackConfig.watch = process.argv.indexOf('--watch') > -1;
+gulp.task('build', ['clean', 'typings'], () => {
+    webpackConfig = require('./webpack.config.js');
+    webpackConfig.watch = process.argv.indexOf('--watch') > -1;
 
-gulp.task('build', ['clean', 'typings'], function(){
-    return gulp.src(['./src/main/**/*.ts'])
+    return gulp.src(['./src/**/*.ts'])
     .pipe(webpack(webpackConfig))
     .pipe(gulp.dest('./build'));
 });
 
-gulp.task('clean', function(){
+gulp.task('clean', () => {
     return del('build');
 });
 
-gulp.task('clean-typings', function(){
+gulp.task('clean-typings', () => {
     return del('typings');
 });
 
-gulp.task('typings', ['clean-typings'], function(){
+gulp.task('typings', ['clean-typings'], () => {
     return gulp.src('./typings.json').pipe(typings());
+});
+
+gulp.task('build-test', () => {
+    webpackConfig = require('./spec/support/webpack.config.js');
+    return gulp.src('./spec/**/*.ts')
+    .pipe(webpack(webpackConfig))
+    .pipe(gulp.dest('./spec'));
+});
+
+gulp.task('test', ['build-test'], () => {
+    return gulp.src('spec/**/*.js')
+    .pipe(jasmine());
 });
