@@ -21,6 +21,7 @@ module.exports = {
         pathinfo: false // show module paths in the bundle, handy for debugging
     },
     externals: [
+        /opencv/,
         /aws\-sdk/
     ],
     target: 'node',

@@ -11,9 +11,19 @@ env:
     - FUNC_NAME='AmazonPAA'
     - ALIAS=$(if [ "$TRAVIS_BRANCH" == 'master' ]; then echo Production; else echo Beta; fi)
 
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install build-essential
+  - sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+  - sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+  - mkdir tmp && cd tmp && curl -L https://github.com/Itseez/opencv/archive/3.1.0.zip | bsdtar -xvf -
+  - cd opencv-* && ls -la && mkdir build && cd build
+  - cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS=No -D CMAKE_INSTALL_PREFIX=$HOME/opencv ..
+  - make && make install
 install:
   - sudo easy_install pip && sudo pip install awscli
   - gem install json --no-document
+  - PKG_CONFIG_PATH=$HOME/opencv/lib/pkgconfig/ npm install --prefix=$HOME/opencvNativeLambda/ opencv
   - (npm install || npm install) && export PATH="$(npm bin):$PATH"
 
 script:
