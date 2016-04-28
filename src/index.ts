@@ -20,7 +20,7 @@ export function handler(event, context, callback) {
     try {
         if (event == 'TEST') {
             jasmine((err) => {
-                callback(err, null);
+                callback(err, 'Done test');
             });
         } else {
             const error = null;
