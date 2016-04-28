@@ -12,6 +12,7 @@ env:
     - ALIAS=$(if [ "$TRAVIS_BRANCH" == 'master' ]; then echo Production; else echo Beta; fi)
 
 before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test
   - sudo apt-get update
   - sudo apt-get install build-essential bsdtar
   - sudo apt-get install gcc-4.8 g++-4.8
