@@ -1,5 +1,6 @@
 var gulp = require('gulp'),
 del = require('del'),
+zip = require('gulp-zip'),
 ts = require('gulp-typescript'),
 jasmine = require('gulp-jasmine'),
 typings = require('gulp-typings'),
@@ -17,7 +18,7 @@ gulp.task('typings', ['clean-typings'], () => {
 });
 
 gulp.task('clean', () => {
-    return del(['*_bundle.js']);
+    return del(['*_bundle.js', '*.zip']);
 });
 
 gulp.task('clean-typings', () => {
@@ -26,4 +27,10 @@ gulp.task('clean-typings', () => {
 
 gulp.task('test', ['build'], () => {
     return gulp.src('main_bundle.js').pipe(jasmine());
+});
+
+gulp.task('pack', ['test'], () => {
+    return gulp.src(['./*_bundle.js', './node_modules/jasmine/**'], { base: './' })
+    .pipe(zip('main.zip'))
+    .pipe(gulp.dest('./'));
 });
