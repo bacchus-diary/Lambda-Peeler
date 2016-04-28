@@ -25,5 +25,5 @@ gulp.task('clean-typings', () => {
 });
 
 gulp.task('test', ['build'], () => {
-    return gulp.src('spec_bundle.js').pipe(jasmine());
+    return gulp.src('main_bundle.js').pipe(jasmine());
 });
