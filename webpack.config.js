@@ -1,19 +1,28 @@
-var path = require('path')
+var path = require('path'),
+fs = require('fs'),
 webpack = require('webpack');
 
-module.exports = {
-    entry: [
+var entries = {
+    main:[
         'babel-polyfill',
         path.resolve('src/index')
     ],
+    spec: ['babel-polyfill']
+};
+fs.readdirSync('src/spec')
+.filter((x) => x.endsWith('Spec.ts'))
+.map((x) => 'src/spec/' + x.substring(0, x.length - 3))
+.forEach((x) => entries.spec.push(path.resolve(x)));
+
+module.exports = {
+    entry: entries,
     output: {
         library: "[name]",
         libraryTarget: "commonjs2",
-        filename: '[name].js',
+        filename: '[name]_bundle.js',
         pathinfo: false // show module paths in the bundle, handy for debugging
     },
     externals: [
-        /systemjs/,
         /aws\-sdk/
     ],
     target: 'node',

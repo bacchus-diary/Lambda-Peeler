@@ -2,8 +2,9 @@
   "name": "peeler",
   "version": "0.0.1",
   "description": "Build flat image from video image",
-  "main": "src/main/index.js",
+  "main": "src/index.js",
   "dependencies": {
+    "jasmine": "^2.4.1",
     "lodash": "^4.11.1",
     "opencv": "^5.0.0"
   },
@@ -20,13 +21,13 @@
     "gulp-typescript": "^2.13.0",
     "gulp-typings": "^1.3.4",
     "gulp-webpack": "^1.5.0",
-    "jasmine": "^2.4.1",
+    "json-loader": "^0.5.4",
     "ts-loader": "^0.8.2",
     "typescript": "^1.8.7",
     "webpack": "^1.13.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp test"
   },
   "author": "Kunio Sawatani",
   "license": "GPL-3.0"

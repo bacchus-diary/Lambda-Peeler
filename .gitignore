@@ -2,4 +2,4 @@
 build/
 node_modules/
 typings/
-spec/*.bundle.js
+*_bundle.js

@@ -1,4 +1,4 @@
-import {Main} from '../src/index';
+import {Main} from '../index';
 
 describe('SampleText', () => {
     it('サンプルは同じ', () => {
