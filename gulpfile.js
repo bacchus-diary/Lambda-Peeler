@@ -1,29 +1,25 @@
 var gulp = require('gulp'),
 del = require('del'),
+ts = require('gulp-typescript'),
+jasmine = require('gulp-jasmine'),
 typings = require('gulp-typings'),
-webpack = require('gulp-webpack'),
-webpackConfig = require('./webpack.config.js');
+webpack = require('gulp-webpack');
 
+gulp.task('build', ['typings'], () => {
+    webpackConfig = require('./webpack.config.js');
+    webpackConfig.watch = process.argv.indexOf('--watch') > -1;
 
-gulp.task('watch', ['clean', 'typings'], function(){
-    return webpack({ watch: true });
+    return webpack(webpackConfig).pipe(gulp.dest('./'));
 });
 
-gulp.task('build', ['clean', 'typings'], function(){
-    gulp.src(['./src/main/**/*.ts'])
-    .pipe(webpack(webpackConfig))
-    .pipe(gulp.dest('./build'));
+gulp.task('typings', () => {
+    return gulp.src('./typings.json').pipe(typings());
 });
 
-gulp.task('clean', function(){
-    return del('www/build');
+gulp.task('clean', () => {
+    return del(['*_bundle.js', 'typings']);
 });
 
-gulp.task('clean-typings', function(){
-    return del('typings');
-});
-
-gulp.task("typings", ['clean-typings'], function(){
-    return gulp.src("./typings.json")
-    .pipe(typings()); //will install all typingsfiles in pipeline.
+gulp.task('test', ['build'], () => {
+    return gulp.src('spec_bundle.js').pipe(jasmine());
 });
