@@ -1,4 +1,4 @@
-import cp = require('child_process');
+import {jasmine} from './spec/jasmine_runner';
 import {Logger} from './util/logging';
 
 const logger = new Logger('Main');
@@ -17,18 +17,18 @@ export class Main {
 
 export function handler(event, context, callback) {
     logger.info(() => `Handling event: ${JSON.stringify(event)}`);
-    if (event == 'TEST') {
-        logger.info(() => `Test run...`);
-        cp.exec('./node_modules/jasmine/bin/jasmine.js', (error, stdout, stderr) => {
-            console.log(error);
-            console.log(stdout);
-            console.log(stderr);
-            callback(error, null);
-        });
-    } else {
-        const error = null;
-        const result = 'OK';
-        callback(error, result);
+    try {
+        if (event == 'TEST') {
+            jasmine((err) => {
+                callback(err, null);
+            });
+        } else {
+            const error = null;
+            const result = 'OK';
+            callback(error, result);
+        }
+    } catch (ex) {
+        callback(ex, null);
     }
 }
 logger.info(() => `Loading me ...`);
