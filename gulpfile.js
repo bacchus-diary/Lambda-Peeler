@@ -12,12 +12,16 @@ gulp.task('build', ['typings'], () => {
     return webpack(webpackConfig).pipe(gulp.dest('./'));
 });
 
-gulp.task('typings', () => {
+gulp.task('typings', ['clean-typings'], () => {
     return gulp.src('./typings.json').pipe(typings());
 });
 
 gulp.task('clean', () => {
-    return del(['*_bundle.js', 'typings']);
+    return del(['*_bundle.js']);
+});
+
+gulp.task('clean-typings', () => {
+    return del(['typings']);
 });
 
 gulp.task('test', ['build'], () => {
