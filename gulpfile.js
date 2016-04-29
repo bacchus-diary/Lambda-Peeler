@@ -31,14 +31,13 @@ gulp.task('test', ['build'], () => {
 });
 
 gulp.task('pack', ['test'], () => {
-    exclude = /aws\-sdk/;
-    sources = ['./*_bundle.js'];
-    require('./webpack.config.js').externals.forEach((regex) => {
-        fs.readdirSync('./node_modules')
-        .filter((x) => !exclude.test(x))
-        .filter((x) => regex.test(x))
-        .forEach((x) => sources.push(`./node_modules/${x}/**`));
-    });
+    const exclude = /aws\-sdk/;
+    const externals = require('./webpack.config.js').externals;
+    const sources = fs.readdirSync('./node_modules')
+    .filter((x) => !exclude.test(x))
+    .filter((x) => externals.some((y) => y.test(x)))
+    .map((x) => `./node_modules/${x}/**`);
+    sources.push('./*_bundle.js');
     console.log(`Packing: ${JSON.stringify(sources, null, 4)}`);
     return gulp.src(sources, { base: './' })
     .pipe(zip('main.zip'))
