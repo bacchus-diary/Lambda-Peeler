@@ -26,8 +26,8 @@ install:
   - cd opencv-* && ls -la && mkdir build && cd build
   - cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS=No -D CMAKE_INSTALL_PREFIX=$HOME/opencv ../
   - make && make install
-  - cd ../../../ && echo "OpenCV Install NativeLib; Finish in $(pwd)"
-  - PKG_CONFIG_PATH=$HOME/opencv/lib/pkgconfig/ npm install --prefix=$TRAVIS_BUILD_DIR/ opencv
+  - cd $TRAVIS_BUILD_DIR && echo "OpenCV Install NativeLib; Finish in $(pwd)"
+  - PKG_CONFIG_PATH=$HOME/opencv/lib/pkgconfig/ npm install --prefix=$(pwd)/ opencv
   - (npm install || npm install) && export PATH="$(npm bin):$PATH"
   - sudo easy_install pip && sudo pip install awscli
   - gem install json --no-document
