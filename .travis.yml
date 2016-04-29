@@ -24,9 +24,9 @@ install:
   - echo "OpenCV Install NativeLib; Start in $(pwd)"
   - mkdir tmp && cd tmp && curl -L https://github.com/Itseez/opencv/archive/3.1.0.zip | bsdtar -xvf -
   - cd opencv-* && ls -la && mkdir build && cd build
-  - cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS=No -D CMAKE_INSTALL_PREFIX=$HOME/opencv ..
+  - cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS=No -D CMAKE_INSTALL_PREFIX=$HOME/opencv ../
   - make && make install
-  - cd ../.. && echo "OpenCV Install NativeLib; Finish in $(pwd)"
+  - cd ../../../ && echo "OpenCV Install NativeLib; Finish in $(pwd)"
   - PKG_CONFIG_PATH=$HOME/opencv/lib/pkgconfig/ npm install --prefix=$TRAVIS_BUILD_DIR/ opencv
   - (npm install || npm install) && export PATH="$(npm bin):$PATH"
   - sudo easy_install pip && sudo pip install awscli
