@@ -8,7 +8,7 @@ branches:
     - /^feature\/\w+/
 env:
   global:
-    - FUNC_NAME='AmazonPAA'
+    - FUNC_NAME='Peeler'
     - ALIAS=$(if [ "$TRAVIS_BRANCH" == 'master' ]; then echo Production; else echo Beta; fi)
 
 before_install:
