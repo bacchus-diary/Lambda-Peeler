@@ -1,4 +1,5 @@
 var gulp = require('gulp'),
+fs = require('fs'),
 del = require('del'),
 zip = require('gulp-zip'),
 ts = require('gulp-typescript'),
@@ -30,7 +31,16 @@ gulp.task('test', ['build'], () => {
 });
 
 gulp.task('pack', ['test'], () => {
-    return gulp.src(['./*_bundle.js', './node_modules/jasmine/**'], { base: './' })
+    exclude = /aws\-sdk/;
+    sources = ['./*_bundle.js'];
+    require('./webpack.config.js').externals.forEach((regex) => {
+        fs.readdirSync('./node_modules')
+        .filter((x) => !exclude.test(x))
+        .filter((x) => regex.test(x))
+        .forEach((x) => sources.push(`./node_modules/${x}/**`));
+    });
+    console.log(`Packing: ${JSON.stringify(sources, null, 4)}`);
+    return gulp.src(sources, { base: './' })
     .pipe(zip('main.zip'))
     .pipe(gulp.dest('./'));
 });
