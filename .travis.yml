@@ -32,9 +32,9 @@ install:
   - (npm install || npm install) && export PATH="$(npm bin):$PATH"
 
 script:
-  - gulp pack
+  - gulp pack && ls -la
   - PRE=$(aws lambda get-alias --function-name $FUNC_NAME --name $ALIAS | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]')
-  - aws lambda update-function-code --function-name $FUNC_NAME --zip-file fileb://main.zip --publish | tee result
+  - aws lambda update-function-code --function-name $FUNC_NAME --zip-file fileb://$TRAVIS_BUILD_DIR/main.zip --publish | tee result
   - VERSION=$(ruby -e 'require "json"; puts JSON.load(open("result"))["Version"]')
   - aws lambda update-alias --function-name $FUNC_NAME --name $ALIAS --function-version $VERSION
   - aws lambda update-alias --function-name $FUNC_NAME --name "${ALIAS}_pre" --function-version $PRE
