@@ -4,3 +4,4 @@ node_modules/
 typings/
 *_bundle.js
 *.zip
+spec/**/*.js
