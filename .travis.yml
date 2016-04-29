@@ -1,5 +1,6 @@
 language: node_js
 node_js: 4.3
+gcc: 4.8
 
 branches:
   only:
@@ -12,8 +13,7 @@ env:
     - ALIAS=$(if [ "$TRAVIS_BRANCH" == 'master' ]; then echo Production; else echo Beta; fi)
 
 before_install:
-  - test -n $CC  && unset CC
-  - test -n $CXX && unset CXX
+  - gcc --version && g++ --version
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -q
   - sudo apt-get install build-essential bsdtar
