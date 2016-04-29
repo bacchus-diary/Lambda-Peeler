@@ -16,9 +16,8 @@ before_install:
   - sudo apt-get update -q
   - sudo apt-get install build-essential bsdtar
   - sudo apt-get install -y gcc-4.9 g++-4.9
-  - (cd /usr/bin && sudo ln -sf gcc-4.9 gcc)
+  - (cd /usr/bin && sudo ln -sf gcc-4.9 gcc && ln -sf g++-4.9 g++)
   - gcc --version && g++ --version
-  - ls -l /usr/bin/g++*
   - sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
   - sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
   - mkdir tmp && cd tmp && curl -L https://github.com/Itseez/opencv/archive/3.1.0.zip | bsdtar -xvf -
