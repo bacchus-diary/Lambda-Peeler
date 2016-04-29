@@ -1,7 +1,7 @@
 {
   "spec_dir": "./",
   "spec_files": [
-    "main_bundle.js"
+    "spec_bundle.js"
   ],
   "stopSpecOnExpectationFailure": false,
   "random": false

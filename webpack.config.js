@@ -2,15 +2,18 @@ const path = require('path'),
 fs = require('fs'),
 webpack = require('webpack');
 
-const entries = [
-    'babel-polyfill',
-    path.resolve('src/index')
-];
+const entries = {
+    main:[
+        'babel-polyfill',
+        path.resolve('src/index')
+    ],
+    spec: ['babel-polyfill']
+};
 const specDir = 'src/spec';
 fs.readdirSync(specDir)
 .filter((x) => x.endsWith('_spec.ts'))
 .map((x) => `${specDir}/${x.substring(0, x.length - 3)}`)
-.forEach((x) => entries.push(path.resolve(x)));
+.forEach((x) => entries.spec.push(path.resolve(x)));
 
 module.exports = {
     entry: entries,
