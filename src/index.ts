@@ -1,4 +1,4 @@
-import {jasmine} from './spec/jasmine_runner';
+import * as spec from './spec/_specs';
 import {Logger} from './util/logging';
 
 const logger = new Logger('Main');
@@ -19,7 +19,7 @@ export function handler(event, context, callback) {
     logger.info(() => `Handling event: ${JSON.stringify(event)}`);
     try {
         if (event == 'TEST') {
-            jasmine((err) => {
+            spec.run((err) => {
                 callback(err, 'Done test');
             });
         } else {

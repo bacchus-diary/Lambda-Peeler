@@ -1,12 +1,16 @@
-import {Main} from '../src/index';
-import {Logger} from '../src/util/logging';
+import * as spec from './_specs';
+
+import {Main} from '../index';
+import {Logger} from '../util/logging';
 
 const logger = new Logger('SampleSpec');
 
-describe('SampleText', () => {
-    it('サンプルは同じ', () => {
-        const main = new Main('AA1');
-        logger.debug(() => `Main: ${main}`);
-        expect(main.sample).toBe('AA1');
-    });
+export const specifications = spec.describe({
+    'SampleText': {
+        'サンプルは同じ': () => {
+            const main = new Main('AA1');
+            logger.debug(() => `Main: ${main}`);
+            spec.expect(main.sample).must_be('AA1');
+        }
+    }
 });

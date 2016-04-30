@@ -1,15 +1,13 @@
 var gulp = require('gulp'),
+cp = require('child_process'),
 fs = require('fs'),
 del = require('del'),
 zip = require('gulp-zip'),
-babel = require('gulp-babel'),
-ts = require('gulp-typescript'),
 replace = require('gulp-replace'),
-jasmine = require('gulp-jasmine'),
 typings = require('gulp-typings'),
 webpack = require('gulp-webpack');
 
-gulp.task('build', ['typings'], () => {
+gulp.task('build', ['typings', 'inject-tests'], () => {
     webpackConfig = require('./webpack.config.js');
     webpackConfig.watch = process.argv.indexOf('--watch') > -1;
 
@@ -28,18 +26,30 @@ gulp.task('clean-typings', () => {
     return del(['typings']);
 });
 
-gulp.task('build-test', ['build'], () => {
-    const proj = ts.createProject('tsconfig.json');
-    return gulp.src('spec/**/*.ts')
-    .pipe(replace(/(import\s+.+\s+from\s+')\.\..*\/src\/.+(';\s*)/g, '$1../main_bundle$2'))
-    .pipe(ts(proj))
-    .pipe(babel({
-        presets: ['es2015', 'stage-0']
-    })).pipe(gulp.dest('spec/'));
+gulp.task('inject-tests', () => {
+    const dir = './src/spec';
+    function specs() {
+        return fs.readdirSync(dir)
+        .filter((x) => x.endsWith('_spec.ts'))
+        .map((x) => `spec('./${x}')`)
+        .join(',\n');
+    }
+    return gulp.src(`${dir}/_specs.ts`)
+    .pipe(replace('/* __FATHENS_ALL_SPECS__ */', specs()))
+    .pipe(gulp.dest(dir));
 });
 
-gulp.task('test', ['build-test'], () => {
-    return gulp.src('spec/**/*.js').pipe(jasmine());
+gulp.task('test', ['build'], () => {
+    return new Promise((resolve, reject) => {
+        const main_bundle = require('./main_bundle');
+        main_bundle.handler('TEST', null, (error, result) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        });
+    });
 });
 
 gulp.task('pack', ['test'], () => {
