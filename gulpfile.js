@@ -1,5 +1,6 @@
 var gulp = require('gulp'),
 cp = require('child_process'),
+path = require('path'),
 fs = require('fs'),
 del = require('del'),
 zip = require('gulp-zip'),
@@ -27,10 +28,20 @@ gulp.task('clean-typings', () => {
 
 gulp.task('inject-tests', (cb) => {
     const dir = './src/spec';
-    const specs = fs.readdirSync(dir)
-    .filter((x) => x.endsWith('_spec.ts'))
-    .map((x) => `./${x}`);
-    fs.writeFile(`${dir}/_specs_list.ts`, `export const list = ${JSON.stringify(specs)}`, cb);
+    const target = `${dir}/_specs_list.ts`;
+    const specs = [];
+    function filesIn(parent) {
+        fs.readdirSync(parent).forEach((name) => {
+            const file = path.join(parent, name);
+            if (fs.statSync(file).isDirectory()) {
+                filesIn(file);
+            } else if (name.endsWith('_spec.ts')) {
+                specs.push('./' + path.relative(dir, file));
+            }
+        });
+    }
+    filesIn(dir);
+    fs.writeFile(target, `export const list = ${JSON.stringify(specs)}`, cb);
 });
 
 gulp.task('test', ['build'], () => {
