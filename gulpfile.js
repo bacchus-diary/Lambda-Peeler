@@ -3,7 +3,6 @@ cp = require('child_process'),
 fs = require('fs'),
 del = require('del'),
 zip = require('gulp-zip'),
-replace = require('gulp-replace'),
 typings = require('gulp-typings'),
 webpack = require('gulp-webpack');
 
@@ -26,17 +25,12 @@ gulp.task('clean-typings', () => {
     return del(['typings']);
 });
 
-gulp.task('inject-tests', () => {
+gulp.task('inject-tests', (cb) => {
     const dir = './src/spec';
-    function specs() {
-        return fs.readdirSync(dir)
-        .filter((x) => x.endsWith('_spec.ts'))
-        .map((x) => `spec('./${x}')`)
-        .join(',\n');
-    }
-    return gulp.src(`${dir}/_specs.ts`)
-    .pipe(replace('/* __FATHENS_ALL_SPECS__ */', specs()))
-    .pipe(gulp.dest(dir));
+    const specs = fs.readdirSync(dir)
+    .filter((x) => x.endsWith('_spec.ts'))
+    .map((x) => `./${x}`);
+    fs.writeFile(`${dir}/_specs_list.ts`, `export const list = ${JSON.stringify(specs)}`, cb);
 });
 
 gulp.task('test', ['build'], () => {

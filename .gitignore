@@ -4,4 +4,4 @@ node_modules/
 typings/
 *_bundle.js
 *.zip
-spec/**/*.js
+/src/spec/_specs_list.ts

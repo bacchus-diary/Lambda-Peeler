@@ -18,14 +18,15 @@ export function run(callback: (error?: any) => void) {
 }
 
 async function all(): Promise<{ [key: string]: SpecResult }> {
-    async function spec(path: string) {
-        const mod = require(path);
-        const result = await mod.specifications();
-        return _.isEmpty(result) ? null : [path, result];
-    }
-    return _.fromPairs(_.compact(await Promise.all([
-        /* __FATHENS_ALL_SPECS__ */
-    ])));
+    const specs = require('./_specs_list').list;
+    logger.debug(() => `Found specs: ${JSON.stringify(specs, null, 4)}`);
+    return _.fromPairs(_.compact(await Promise.all(
+        specs.map(async (path) => {
+            const mod = require(path);
+            const result = await mod.specifications();
+            return _.isEmpty(result) ? null : [path, result];
+        })
+    )));
 }
 
 export type Specifications = () => Promise<SpecResult>;
