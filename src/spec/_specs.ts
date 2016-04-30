@@ -17,7 +17,7 @@ export function run(callback: (error?: any) => void) {
     })
 }
 
-async function all(): Promise<{[key: string]: SpecResult}> {
+async function all(): Promise<{ [key: string]: SpecResult }> {
     async function spec(path: string) {
         const mod = require(path);
         const result = await mod.specifications();
