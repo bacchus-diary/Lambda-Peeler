@@ -81,7 +81,7 @@ export class Expect<T> {
 }
 
 export function nearly_equal(actual: number, expected: number, p: number) {
-    const diff = Math.abs((this.value as number) - (expected as number));
+    const diff = Math.abs(actual - expected);
     if (expected * p < diff) {
         throw `'${actual}' nearly equal to '${expected}'±'${p}'`;
     }
