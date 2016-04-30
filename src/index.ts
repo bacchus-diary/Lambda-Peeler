@@ -13,6 +13,16 @@ export class Main {
     get sample(): string {
         return this._sample;
     }
+
+    async flight(): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            logger.info(() => `Taking off...`);
+            setTimeout(() => {
+                logger.info(() => `Flighting`);
+                resolve('Sky');
+            }, 1000);
+        });
+    }
 }
 
 export function handler(event, context, callback) {
