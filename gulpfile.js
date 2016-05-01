@@ -1,4 +1,5 @@
 var gulp = require('gulp'),
+_ = require('lodash'),
 cp = require('child_process'),
 path = require('path'),
 fs = require('fs'),
@@ -6,6 +7,19 @@ del = require('del'),
 zip = require('gulp-zip'),
 typings = require('gulp-typings'),
 webpack = require('gulp-webpack');
+
+function filesRecursive(parent, regex) {
+    return _.flatten(_.compact(
+        fs.readdirSync(parent).map((name) => {
+            const file = path.join(parent, name);
+            if (fs.statSync(file).isDirectory()) {
+                return filesRecursive(file, regex);
+            } else if (regex.test(name)) {
+                return file;
+            }
+        })
+    ));
+}
 
 gulp.task('build', ['typings', 'inject-tests'], () => {
     webpackConfig = require('./webpack.config.js');
@@ -29,19 +43,9 @@ gulp.task('clean-typings', () => {
 gulp.task('inject-tests', (cb) => {
     const dir = './src/spec';
     const target = `${dir}/_specs.json`;
-    const filter = /.*_spec\.ts$/;
-    const specs = [];
-    function filesIn(parent) {
-        fs.readdirSync(parent).forEach((name) => {
-            const file = path.join(parent, name);
-            if (fs.statSync(file).isDirectory()) {
-                filesIn(file);
-            } else if (filter.test(name)) {
-                specs.push('./' + path.relative(dir, file));
-            }
-        });
-    }
-    filesIn(dir);
+    const specs = filesRecursive(dir, /.*_spec\.ts$/).map(
+        (file) => './' + path.relative(dir, file)
+    );
     fs.writeFile(target, JSON.stringify(specs), cb);
 });
 
