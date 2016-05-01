@@ -6,23 +6,25 @@ import {Logger} from '../../util/logging';
 
 const logger = new Logger('OpenCVSampleSpec');
 
+type OpenCVCallback<T> = (error, data: T) => void;
+function toPromise<T>(proc: (cb: OpenCVCallback<T>) => void): Promise<T> {
+    return new Promise((resolve, reject) => {
+        proc((error, data) => {
+            if (error) reject(error);
+            else resolve(data);
+        })
+    });
+}
+
 export const specifications = spec.describe({
     'MonaLisa': {
         '顔の位置': async () => {
-            const im = await new Promise<any>((resolve, reject) => {
-                cv.readImage('./node_modules/opencv/examples/files/mona.png', function(err, im) {
-                    if (err) reject(err);
-                    else {
-                        if (im.width() < 1 || im.height() < 1) reject('Image has no size');
-                        else resolve(im);
-                    }
-                })
+            const im = await toPromise<any>((cb) => {
+                cv.readImage('./node_modules/opencv/examples/files/mona.png', cb);
             });
-            const faces = await new Promise<any>((resolve, reject) => {
-                im.detectObject('./node_modules/opencv/data/haarcascade_frontalface_alt.xml', {}, function(err, faces) {
-                    if (err) reject(err);
-                    else resolve(faces);
-                });
+            if (im.width() < 1 || im.height() < 1) throw 'Image has no size';
+            const faces = await toPromise<any>((cb) => {
+                im.detectObject('./node_modules/opencv/data/haarcascade_frontalface_alt.xml', {}, cb);
             });
             logger.debug(() => `Faces: ${JSON.stringify(faces)}`);
 
