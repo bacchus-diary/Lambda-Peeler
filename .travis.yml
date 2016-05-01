@@ -22,7 +22,7 @@ before_install:
   - sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
 install:
   - echo "OpenCV Install NativeLib; Start in $(pwd)"
-  - mkdir tmp && cd tmp && curl -L https://github.com/Itseez/opencv/archive/3.1.0.zip | bsdtar -xvf -
+  - mkdir tmp && cd tmp && curl -L https://github.com/Itseez/opencv/archive/2.4.12.zip | bsdtar -xvf -
   - cd opencv-* && ls -la && mkdir build && cd build
   - cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS=No -D CMAKE_INSTALL_PREFIX=$HOME/opencv ../
   - make && make install
