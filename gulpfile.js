@@ -20,17 +20,11 @@ function filesRecursive(parent, regex, callback) {
                         if (error) {
                             reject(error);
                         } else if (stats.isDirectory()) {
-                            filesRecursive(file, regex, (error, files) => {
-                                if (error) {
-                                    reject(error);
-                                } else {
-                                    resolve(files);
-                                }
-                            });
-                        } else if (regex.test(name)) {
-                            resolve(file);
+                            filesRecursive(file, regex,
+                                (error, files) => error ? reject(error) : resolve(files)
+                            );
                         } else {
-                            resolve(null);
+                            resolve(regex.test(name) ? file : null);
                         }
                     });
                 }))
@@ -51,13 +45,9 @@ gulp.task('typings', ['clean-typings'], () => {
     return gulp.src('./typings.json').pipe(typings());
 });
 
-gulp.task('clean', () => {
-    return del(['*_bundle.js', '*.zip']);
-});
+gulp.task('clean', () => del(['*_bundle.js', '*.zip']));
 
-gulp.task('clean-typings', () => {
-    return del(['typings']);
-});
+gulp.task('clean-typings', () => del(['typings']));
 
 gulp.task('inject-tests', (cb) => {
     const dir = './src/spec';
@@ -79,12 +69,14 @@ gulp.task('test', ['build'], (cb) => {
 gulp.task('pack', ['test'], () => {
     const exclude = /aws\-sdk/;
     const externals = require('./webpack.config.js').externals;
+
     const sources = ['./*_bundle.js'];
     fs.readdirSync('./node_modules')
     .filter((x) => !exclude.test(x))
     .filter((x) => externals.some((y) => y.test(x)))
     .forEach((x) => sources.push(`./node_modules/${x}/**`));
     console.log(`Packing: ${JSON.stringify(sources, null, 4)}`);
+
     return gulp.src(sources, { base: './' })
     .pipe(zip('main.zip'))
     .pipe(gulp.dest('./'));
