@@ -29,10 +29,12 @@ export const specifications = spec.describe({
             logger.debug(() => `Faces: ${JSON.stringify(faces)}`);
 
             spec.expect(faces.length).must_be(1);
-            spec.expect(faces[0].x).must_be(155);
-            spec.expect(faces[0].y).must_be(117);
-            spec.expect(faces[0].width).must_be(140);
-            spec.expect(faces[0].height).must_be(140);
+            spec.expect(faces[0]).must_be({
+                x: 155,
+                y: 117,
+                width: 140,
+                height: 140
+            });
         }
     }
 });

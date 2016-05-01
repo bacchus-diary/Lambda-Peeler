@@ -74,7 +74,19 @@ export class Expect<T> {
     constructor(private value: T) { }
 
     must_be(expected: T) {
-        if (this.value != expected) {
+        if (expected instanceof Object) {
+            _.keysIn(expected).forEach((key) => {
+                try {
+                    expect(this.value[key]).must_be(expected[key])
+                } catch (ex) {
+                    if (typeof ex != 'string' || ex.startsWith("'")) {
+                        throw `${key}: ${ex}`;
+                    } else {
+                        throw `${key}.${ex}`;
+                    }
+                }
+            });
+        } else if (this.value != expected) {
             throw `'${this.value}' must be '${expected}'`;
         }
     }
