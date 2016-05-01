@@ -35,6 +35,7 @@ after_success:
   - PRE=$(aws lambda get-alias --function-name $FUNC_NAME --name $ALIAS | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]' || echo '1')
   - aws lambda update-function-code --function-name $FUNC_NAME --zip-file fileb://$TRAVIS_BUILD_DIR/main.zip --publish | tee result
   - VERSION=$(ruby -e 'require "json"; puts JSON.load(open("result"))["Version"]')
-  - aws lambda update-alias --function-name $FUNC_NAME --name $ALIAS --function-version $VERSION
-  - aws lambda update-alias --function-name $FUNC_NAME --name "${ALIAS}_pre" --function-version $PRE
+  - CU=$(if [ -z $PRE ]; then echo -n 'create'; else echo -n 'update'; fi)
+  - aws lambda $CU-alias --function-name $FUNC_NAME --name $ALIAS --function-version $VERSION
+  - aws lambda $CU-alias --function-name $FUNC_NAME --name "${ALIAS}_pre" --function-version $PRE
   - curl -v -X POST -H "Authorization:token $GITHUB_OAUTH_TOKEN" https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs -d "{\"ref\":\"refs/tags/deploy/$VERSION\", \"sha\":\"$(git log HEAD -n1 --format=%H)\"}"
