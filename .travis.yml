@@ -21,13 +21,12 @@ before_install:
   - sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
   - sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
 install:
-  - echo "OpenCV Install NativeLib; Start in $(pwd)"
   - mkdir tmp && cd tmp && curl -L https://github.com/Itseez/opencv/archive/2.4.12.zip | bsdtar -xvf -
   - cd opencv-* && ls -la && mkdir build && cd build
   - cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_SHARED_LIBS=No -D CMAKE_INSTALL_PREFIX=$HOME/opencv ../
   - make && make install
-  - cd $TRAVIS_BUILD_DIR && echo "OpenCV Install NativeLib; Finish in $(pwd)"
-  - PKG_CONFIG_PATH=$HOME/opencv/lib/pkgconfig/ npm install --prefix=$(pwd)/ opencv
+  - cd $TRAVIS_BUILD_DIR
+  - PKG_CONFIG_PATH=$HOME/opencv/lib/pkgconfig/ npm install opencv
   - (npm install || npm install) && export PATH="$(npm bin):$PATH"
   - sudo easy_install pip && sudo pip install awscli
   - gem install json --no-document
