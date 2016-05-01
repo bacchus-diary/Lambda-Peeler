@@ -72,17 +72,8 @@ gulp.task('inject-tests', (cb) => {
     });
 });
 
-gulp.task('test', ['build'], () => {
-    return new Promise((resolve, reject) => {
-        const main_bundle = require('./main_bundle');
-        main_bundle.handler('TEST', null, (error, result) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
-        });
-    });
+gulp.task('test', ['build'], (cb) => {
+    require('./main_bundle').handler('TEST', null, cb);
 });
 
 gulp.task('pack', ['test'], () => {
