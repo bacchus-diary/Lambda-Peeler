@@ -29,13 +29,14 @@ gulp.task('clean-typings', () => {
 gulp.task('inject-tests', (cb) => {
     const dir = './src/spec';
     const target = `${dir}/_specs.json`;
+    const filter = /.*_spec\.ts$/;
     const specs = [];
     function filesIn(parent) {
         fs.readdirSync(parent).forEach((name) => {
             const file = path.join(parent, name);
             if (fs.statSync(file).isDirectory()) {
                 filesIn(file);
-            } else if (name.endsWith('_spec.ts')) {
+            } else if (filter.test(name)) {
                 specs.push('./' + path.relative(dir, file));
             }
         });
