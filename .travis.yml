@@ -33,7 +33,9 @@ install:
   - gem install json --no-document
 
 script:
-  - gulp pack && ls -la
+  - gulp pack
+
+after_success:
   - PRE=$(aws lambda get-alias --function-name $FUNC_NAME --name $ALIAS | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]')
   - aws lambda update-function-code --function-name $FUNC_NAME --zip-file fileb://$TRAVIS_BUILD_DIR/main.zip --publish | tee result
   - VERSION=$(ruby -e 'require "json"; puts JSON.load(open("result"))["Version"]')
