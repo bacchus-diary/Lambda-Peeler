@@ -20,7 +20,7 @@ before_install:
 install:
   - mkdir tmp && cd tmp && curl -L https://github.com/Itseez/opencv/archive/2.4.12.zip | bsdtar -xvf -
   - cd opencv-* && ls -la && mkdir build && cd build
-  - cmake -D CMAKE_BUILD_TYPE=RELEASE -D BUILD_SHARED_LIBS=NO -D CMAKE_INSTALL_PREFIX=$HOME/opencv ../
+  - cmake -D CMAKE_BUILD_TYPE=RELEASE -D BUILD_SHARED_LIBS=NO -D WITH_GTK=NO -D WITH_GTHREAD -D CMAKE_INSTALL_PREFIX=$HOME/opencv ../
   - make && make install
   - cd $TRAVIS_BUILD_DIR
   - PKG_CONFIG_PATH=$HOME/opencv/lib/pkgconfig/ npm install opencv
