@@ -32,7 +32,7 @@ script:
   - gulp pack
 
 after_success:
-  - PRE=$(aws lambda get-alias --function-name $FUNC_NAME --name $ALIAS | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]')
+  - PRE=$(aws lambda get-alias --function-name $FUNC_NAME --name $ALIAS | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]' || echo '1')
   - aws lambda update-function-code --function-name $FUNC_NAME --zip-file fileb://$TRAVIS_BUILD_DIR/main.zip --publish | tee result
   - VERSION=$(ruby -e 'require "json"; puts JSON.load(open("result"))["Version"]')
   - aws lambda update-alias --function-name $FUNC_NAME --name $ALIAS --function-version $VERSION
