@@ -28,7 +28,7 @@ gulp.task('clean-typings', () => {
 
 gulp.task('inject-tests', (cb) => {
     const dir = './src/spec';
-    const target = `${dir}/_specs_list.ts`;
+    const target = `${dir}/_specs.json`;
     const specs = [];
     function filesIn(parent) {
         fs.readdirSync(parent).forEach((name) => {
@@ -41,7 +41,7 @@ gulp.task('inject-tests', (cb) => {
         });
     }
     filesIn(dir);
-    fs.writeFile(target, `export const list = ${JSON.stringify(specs)}`, cb);
+    fs.writeFile(target, JSON.stringify(specs), cb);
 });
 
 gulp.task('test', ['build'], () => {

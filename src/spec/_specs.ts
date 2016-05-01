@@ -18,7 +18,7 @@ export function run(callback: (error?: any) => void) {
 }
 
 async function all(): Promise<{ [key: string]: SpecResult }> {
-    const specs = require('./_specs_list').list;
+    const specs = require('./_specs.json');
     logger.debug(() => `Found specs: ${JSON.stringify(specs, null, 4)}`);
     return _.fromPairs(_.compact(await Promise.all(
         specs.map(async (path) => {
