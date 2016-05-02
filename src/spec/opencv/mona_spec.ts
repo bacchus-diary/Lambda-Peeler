@@ -1,10 +1,10 @@
-import * as spec from '../_specs';
+import * as spec from "../_specs";
 
-import * as cv from 'opencv';
+import * as cv from "opencv";
 
-import {Logger} from '../../util/logging';
+import {Logger} from "../../util/logging";
 
-const logger = new Logger('OpenCVSampleSpec');
+const logger = new Logger("OpenCVSampleSpec");
 
 type OpenCVCallback<T> = (error, data: T) => void;
 function toPromise<T>(proc: (cb: OpenCVCallback<T>) => void): Promise<T> {
@@ -12,19 +12,19 @@ function toPromise<T>(proc: (cb: OpenCVCallback<T>) => void): Promise<T> {
         proc((error, data) => {
             if (error) reject(error);
             else resolve(data);
-        })
+        });
     });
 }
 
 export const specifications = spec.describe({
-    'MonaLisa': {
-        '顔の位置': async () => {
+    "MonaLisa": {
+        "顔の位置": async () => {
             const im = await toPromise<any>((cb) => {
-                cv.readImage('./node_modules/opencv/examples/files/mona.png', cb);
+                cv.readImage("./node_modules/opencv/examples/files/mona.png", cb);
             });
-            if (im.width() < 1 || im.height() < 1) throw 'Image has no size';
+            if (im.width() < 1 || im.height() < 1) throw "Image has no size";
             const faces = await toPromise<any>((cb) => {
-                im.detectObject('./node_modules/opencv/data/haarcascade_frontalface_alt.xml', {}, cb);
+                im.detectObject("./node_modules/opencv/data/haarcascade_frontalface_alt.xml", {}, cb);
             });
             logger.debug(() => `Faces: ${JSON.stringify(faces)}`);
 
