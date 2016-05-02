@@ -14,7 +14,7 @@ env:
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update
-  - sudo apt-get install cmake git pkg-config libavcodec-dev libavformat-dev libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev bsdtar gcc-4.9 g++-4.9
+  - sudo apt-get install cmake git pkg-config libavcodec-dev libavformat-dev libswscale-dev libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev bsdtar gcc-4.9 g++-4.9
   - (cd /usr/bin && sudo ln -sf gcc-4.9 gcc && sudo ln -sf g++-4.9 g++ && ls -l c++* gcc* g++*)
   - gcc --version && g++ --version
 install:
