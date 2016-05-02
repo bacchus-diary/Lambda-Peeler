@@ -1,8 +1,8 @@
 import * as spec from "../_specs";
 
-import * as cv from "opencv";
-
 import {Logger} from "../../util/logging";
+
+const cv = require("opencv");
 
 const logger = new Logger("OpenCVSampleSpec");
 
