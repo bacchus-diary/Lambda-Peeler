@@ -16,7 +16,7 @@ env:
 
 before_install:
   - docker pull sawatani/ami-60b6c60a
-  - docker run -v `pwd`:`pwd` -w `pwd` sawatani/ami-60b6c60a /bin/sh -c 'ls -la /home/ && pwd && ls -la && (npm install || npm install) && $(npm bin)/gulp pack'
+  - docker run -v $(pwd):$(pwd) -w $(pwd) sawatani/ami-60b6c60a /bin/sh -c 'mkdir node && cd node && wget https://nodejs.org/download/release/v4.3.2/node-v4.3.2-linux-x64.tar.gz && tar zxf * && cd */ && whoami && ./configure && make && make install && cd ../../ && pwd && ls -la && (npm install || npm install) && $(npm bin)/gulp pack'
   - exit
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update
