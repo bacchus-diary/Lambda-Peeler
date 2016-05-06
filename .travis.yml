@@ -16,7 +16,7 @@ env:
 
 before_install:
   - docker pull sawatani/ami-60b6c60a
-  - docker run sawatani/ami-60b6c60a bash
+  - docker run -it sawatani/ami-60b6c60a bash
   - ls -la /home/
   - exit
   - exit
