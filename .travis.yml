@@ -15,9 +15,9 @@ env:
 install:
   - sudo easy_install pip && sudo pip install awscli
   - gem install json --no-document
+  - docker pull sawatani/ami-lambda_node43:opencv24
 
 script:
-  - docker pull sawatani/ami-lambda_node43:opencv24
   - docker run -v $(pwd):$(pwd) -w $(pwd) sawatani/ami-lambda_node43:opencv24 /bin/sh -c 'PKG_CONFIG_PATH=/usr/local/opencv/lib/pkgconfig/ npm install opencv && (npm install || npm install) && $(npm bin)/gulp pack'
 
 after_success:
