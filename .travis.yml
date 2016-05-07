@@ -11,8 +11,8 @@ branches:
     - /^feature\/\w+/
 env:
   global:
-    - FUNC_NAME='Peeler'
-    - ALIAS=$(if [ "$TRAVIS_BRANCH" == 'master' ]; then echo Production; else echo Beta; fi)
+    - AWS_LAMBDA_FUNC_NAME='Peeler'
+    - AWS_LAMBDA_ALIAS_NAME=$(if [ "$TRAVIS_BRANCH" == 'master' ]; then echo Production; else echo Beta; fi)
 
 install:
   - sudo easy_install pip && sudo pip install awscli
@@ -23,10 +23,10 @@ script:
   - docker run -v $(pwd):$(pwd) -w $(pwd) sawatani/ami-lambda_node43:opencv24 /bin/sh -c 'PKG_CONFIG_PATH=/usr/local/opencv/lib/pkgconfig/ npm install opencv && (npm install || npm install) && $(npm bin)/gulp pack'
 
 after_success:
-  - PRE=$(aws lambda get-alias --function-name $FUNC_NAME --name $ALIAS | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]')
-  - aws lambda update-function-code --function-name $FUNC_NAME --zip-file fileb://$TRAVIS_BUILD_DIR/main.zip --publish | tee result
+  - PRE=$(aws lambda get-alias --function-name $AWS_LAMBDA_FUNC_NAME --name $AWS_LAMBDA_ALIAS_NAME | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]')
+  - aws lambda update-function-code --function-name $AWS_LAMBDA_FUNC_NAME --zip-file fileb://$TRAVIS_BUILD_DIR/main.zip --publish | tee result
   - VERSION=$(ruby -e 'require "json"; puts JSON.load(open("result"))["Version"]')
   - if [ -z $PRE ]; then PRE=$VERSION; CU='create'; else CU='update'; fi
-  - aws lambda $CU-alias --function-name $FUNC_NAME --name $ALIAS --function-version $VERSION
-  - aws lambda $CU-alias --function-name $FUNC_NAME --name "${ALIAS}_pre" --function-version $PRE
+  - aws lambda $CU-alias --function-name $AWS_LAMBDA_FUNC_NAME --name $AWS_LAMBDA_ALIAS_NAME --function-version $VERSION
+  - aws lambda $CU-alias --function-name $AWS_LAMBDA_FUNC_NAME --name "${AWS_LAMBDA_ALIAS_NAME}_pre" --function-version $PRE
   - curl -v -X POST -H "Authorization:token $GITHUB_OAUTH_TOKEN" https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs -d "{\"ref\":\"refs/tags/deploy/$VERSION\", \"sha\":\"$(git log HEAD -n1 --format=%H)\"}"
