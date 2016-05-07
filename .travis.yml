@@ -20,7 +20,7 @@ install:
 
 script:
   - docker pull sawatani/ami-lambda_node43:opencv24
-  - docker run -v $(pwd):$(pwd) -w $(pwd) -e PKG_CONFIG_PATH=/usr/local/opencv/lib/pkgconfig/ sawatani/ami-lambda_node43:opencv24 /bin/sh -c 'npm install opencv && (npm install || npm install) && $(npm bin)/gulp pack'
+  - docker run -v $(pwd):$(pwd) -w $(pwd) sawatani/ami-lambda_node43:opencv24 /bin/sh -c 'PKG_CONFIG_PATH=/usr/local/opencv/lib/pkgconfig/ npm install opencv && (npm install || npm install) && $(npm bin)/gulp pack'
 
 after_success:
   - PRE=$(aws lambda get-alias --function-name $FUNC_NAME --name $ALIAS | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]')
