@@ -11,14 +11,15 @@ env:
   global:
     - AWS_LAMBDA_FUNC_NAME='Peeler'
     - AWS_LAMBDA_ALIAS_NAME=$(if [ "$TRAVIS_BRANCH" == 'master' ]; then echo Production; else echo Beta; fi)
+    - DOCKER_IMAGE=sawatani/ami-lambda_node43:opencv24
 
 install:
   - sudo easy_install pip && sudo pip install awscli
   - gem install json --no-document
-  - docker pull sawatani/ami-lambda_node43:opencv24
+  - docker pull $DOCKER_IMAGE
 
 script:
-  - docker run -v $(pwd):$(pwd) -w $(pwd) sawatani/ami-lambda_node43:opencv24 /bin/sh -c 'PKG_CONFIG_PATH=/usr/local/opencv/lib/pkgconfig/ npm install opencv && (npm install || npm install) && $(npm bin)/gulp pack'
+  - docker run -v $(pwd):$(pwd) -w $(pwd) $DOCKER_IMAGE /bin/sh -c 'PKG_CONFIG_PATH=/usr/local/opencv/lib/pkgconfig/ npm install opencv && (npm install || npm install) && $(npm bin)/gulp pack'
 
 after_success:
   - PRE=$(aws lambda get-alias --function-name $AWS_LAMBDA_FUNC_NAME --name $AWS_LAMBDA_ALIAS_NAME | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]')
