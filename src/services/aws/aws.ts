@@ -1,8 +1,8 @@
-import {Logger} from '../../util/logging';
+import {Logger} from "../../util/logging";
 
-export * from 'aws-sdk';
+export * from "aws-sdk";
 
-const logger = new Logger('AWS');
+const logger = new Logger("AWS");
 
 export class Credential {
     constructor(

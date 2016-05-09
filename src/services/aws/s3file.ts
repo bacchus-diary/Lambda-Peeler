@@ -1,7 +1,7 @@
-import {Logger} from '../../util/logging';
-import * as AWS from './aws';
+import {Logger} from "../../util/logging";
+import * as AWS from "./aws";
 
-const logger = new Logger('S3File');
+const logger = new Logger("S3File");
 
 export class S3File {
     constructor(private bucketName: string, cred: AWS.Credential) {
@@ -87,7 +87,7 @@ export class S3File {
         const s3: any = await this.client;
         logger.debug(() => `Getting url of file: ${this.bucketName}:${path}`);
         try {
-            return s3.getSignedUrl('getObject', {
+            return s3.getSignedUrl("getObject", {
                 Bucket: this.bucketName,
                 Key: path,
                 Expires: expiresInSeconds
