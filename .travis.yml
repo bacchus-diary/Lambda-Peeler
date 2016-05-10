@@ -11,7 +11,7 @@ env:
   global:
     - AWS_LAMBDA_FUNC_NAME='Peeler'
     - AWS_LAMBDA_ALIAS_NAME=$(if [ "$TRAVIS_BRANCH" == 'master' ]; then echo Production; else echo Beta; fi)
-    - DOCKER_IMAGE=sawatani/ami-lambda_node43:opencv24
+    - DOCKER_IMAGE=fathens/lambda-node43_opencv24
 
 install:
   - sudo easy_install pip && sudo pip install awscli
