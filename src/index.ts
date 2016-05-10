@@ -1,29 +1,7 @@
 import * as spec from "./spec/_specs";
 import {Logger} from "./util/logging";
 
-const logger = new Logger("Main");
-
-export class Main {
-    static run() {
-        console.log("Hello World !");
-    }
-
-    constructor(private _sample: string) { }
-
-    get sample(): string {
-        return this._sample;
-    }
-
-    async flight(): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            logger.info(() => `Taking off...`);
-            setTimeout(() => {
-                logger.info(() => `Flighting`);
-                resolve("Sky");
-            }, 1000);
-        });
-    }
-}
+const logger = new Logger("Hander");
 
 export function handler(event, context, callback) {
     logger.info(() => `Handling event: ${JSON.stringify(event)}`);
