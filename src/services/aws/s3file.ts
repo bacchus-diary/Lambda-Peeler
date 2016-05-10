@@ -1,16 +1,13 @@
 import {Logger} from "../../util/logging";
 import * as AWS from "./aws";
+const fs = require("fs");
 
 const logger = new Logger("S3File");
 
 export class S3File {
-    constructor(private bucketName: string, cred: AWS.Credential) {
+    constructor(private bucketName: string) {
         logger.debug(() => `Creting S3: ${AWS.S3}`);
-        this.client = new AWS.S3({
-            accessKeyId: cred.accessKeyId,
-            secretAccessKey: cred.secretAccessKey,
-            region: cred.region
-        });
+        this.client = new AWS.S3();
     }
 
     private client: AWS.S3;
