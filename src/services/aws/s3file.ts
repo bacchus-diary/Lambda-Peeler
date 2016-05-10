@@ -28,6 +28,15 @@ export class S3File {
         return String.fromCharCode.apply(null, res.Body);
     }
 
+    async download(path: string, dst: string): Promise<void> {
+        logger.debug(() => `Reading file: ${this.bucketName}:${path}`);
+        const res = await this.invoke<{ Body: number[] }>((s3) => s3.getObject({
+            Bucket: this.bucketName,
+            Key: path
+        }));
+        fs.createWriteStream(dst).write(res.Body);
+    }
+
     async upload(path: string, blob: Blob): Promise<void> {
         logger.debug(() => `Uploading file: ${this.bucketName}:${path}`);
         await this.invoke((s3) => s3.putObject({
