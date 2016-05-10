@@ -4,6 +4,10 @@
 Vagrant.configure(2) do |config|
   config.vm.box = "fathens/centos-node43_opencv24"
 
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 1024
+  end
+
   if Vagrant.has_plugin?("vagrant-timezone")
     config.timezone.value = :host
   end
