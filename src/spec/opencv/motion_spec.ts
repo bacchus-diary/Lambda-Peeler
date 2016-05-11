@@ -7,13 +7,13 @@ import {Logger} from "../../util/logging";
 
 const logger = new Logger("OpenCVMotionSpec");
 
-const s3 = new S3File("bacchus-diary-test");
+const s3 = new S3File("build-config");
 
 export const specifications = spec.describe({
     "Motion": {
         "フレームの読み込み": async () => {
             const filepath = path.resolve("tmp_motion.mp4");
-            await s3.download("lambda/Peeler/sample/pickled_cucumbers.mp4", filepath);
+            await s3.download("bacchus-diary/Lambda-Peeler/test_data/pickled_cucumbers.mp4", filepath);
             logger.debug(() => `Opening file: ${filepath}`);
             const vc = new CV.VideoCapture(filepath);
             const im = await toPromise<any>((cb) => {
