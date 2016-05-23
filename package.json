@@ -7,7 +7,7 @@
     "lodash": "^4.11.1"
   },
   "devDependencies": {
-    "aws-sdk": "^2.3.6",
+    "aws-sdk": "2.2.48",
     "babel-core": "^6.7.7",
     "babel-loader": "^6.2.4",
     "babel-polyfill": "^6.7.4",

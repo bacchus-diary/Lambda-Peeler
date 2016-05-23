@@ -70,7 +70,7 @@ gulp.task('pack', ['test'], () => {
     const exclude = /aws\-sdk/;
     const externals = require('./webpack.config.js').externals;
 
-    const sources = ['./*_bundle.js'];
+    const sources = ['./*_bundle.js', 'lib', 'share'];
     fs.readdirSync('./node_modules')
     .filter((x) => !exclude.test(x))
     .filter((x) => externals.some((y) => y.test(x)))

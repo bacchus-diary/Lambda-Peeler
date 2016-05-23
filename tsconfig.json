@@ -7,7 +7,6 @@
   },
   "filesGlob": [
     "src/**/*.ts",
-    "spec/**/*.ts",
     "typings/main.d.ts"
   ],
   "exclude": [

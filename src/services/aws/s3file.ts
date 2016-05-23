@@ -1,16 +1,13 @@
-import {Logger} from '../../util/logging';
-import * as AWS from './aws';
+import {Logger} from "../../util/logging";
+import * as AWS from "./aws";
+const fs = require("fs");
 
-const logger = new Logger('S3File');
+const logger = new Logger("S3File");
 
 export class S3File {
-    constructor(private bucketName: string, cred: AWS.Credential) {
+    constructor(private bucketName: string) {
         logger.debug(() => `Creting S3: ${AWS.S3}`);
-        this.client = new AWS.S3({
-            accessKeyId: cred.accessKeyId,
-            secretAccessKey: cred.secretAccessKey,
-            region: cred.region
-        });
+        this.client = new AWS.S3();
     }
 
     private client: AWS.S3;
@@ -26,6 +23,15 @@ export class S3File {
             Key: path
         }));
         return String.fromCharCode.apply(null, res.Body);
+    }
+
+    async download(path: string, dst: string): Promise<void> {
+        logger.debug(() => `Reading file: ${this.bucketName}:${path}`);
+        const res = await this.invoke<{ Body: number[] }>((s3) => s3.getObject({
+            Bucket: this.bucketName,
+            Key: path
+        }));
+        fs.createWriteStream(dst).write(res.Body);
     }
 
     async upload(path: string, blob: Blob): Promise<void> {
@@ -87,7 +93,7 @@ export class S3File {
         const s3: any = await this.client;
         logger.debug(() => `Getting url of file: ${this.bucketName}:${path}`);
         try {
-            return s3.getSignedUrl('getObject', {
+            return s3.getSignedUrl("getObject", {
                 Bucket: this.bucketName,
                 Key: path,
                 Expires: expiresInSeconds

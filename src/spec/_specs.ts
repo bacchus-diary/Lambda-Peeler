@@ -1,6 +1,6 @@
-import {Logger} from '../util/logging';
+import {Logger} from "../util/logging";
 
-const logger = new Logger('SpecRunner');
+const logger = new Logger("SpecRunner");
 
 export function run(callback: (error?: any) => void) {
     logger.info(() => `Test start...`);
@@ -14,11 +14,11 @@ export function run(callback: (error?: any) => void) {
         }
     }).catch((ex) => {
         callback(ex);
-    })
+    });
 }
 
 async function all(): Promise<{ [key: string]: SpecResult }> {
-    const specs = require('./_specs.json');
+    const specs = require("./_specs.json");
     logger.debug(() => `Found specs: ${JSON.stringify(specs, null, 4)}`);
     return _.fromPairs(_.compact(await Promise.all(
         specs.map(async (path) => {
@@ -61,9 +61,9 @@ export function describe(specs: { [key: string]: { [key: string]: SpecUnit } }):
                 }
             }));
             if (!_.isEmpty(failures)) result[name] = failures;
-        }))
+        }));
         return result;
-    }
+    };
 }
 
 export function expect<T>(v: T): Expect<T> {
@@ -74,8 +74,20 @@ export class Expect<T> {
     constructor(private value: T) { }
 
     must_be(expected: T) {
-        if (this.value != expected) {
-            throw `'${this.value}' must be '${expected}'`;
+        if (expected instanceof Object) {
+            _.keysIn(expected).forEach((key) => {
+                try {
+                    expect(this.value[key]).must_be(expected[key]);
+                } catch (ex) {
+                    if (typeof ex !== "string" || ex.startsWith("'")) {
+                        throw `${key}: ${ex}`;
+                    } else {
+                        throw `${key}.${ex}`;
+                    }
+                }
+            });
+        } else if (this.value !== expected) {
+            throw `"${this.value}" must be "${expected}"`;
         }
     }
 }
@@ -83,6 +95,6 @@ export class Expect<T> {
 export function nearly_equal(actual: number, expected: number, p: number) {
     const diff = Math.abs(actual - expected);
     if (expected * p < diff) {
-        throw `'${actual}' nearly equal to '${expected}'±'${p}'`;
+        throw `"${actual}" nearly equal to "${expected}"±"${p}"`;
     }
 }
