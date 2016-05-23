@@ -2,7 +2,7 @@ FROM fathens/docker-lambda-opencv24
 
 RUN set -x \
  && yum update -y \
- && yum install -y openssh-server sudo net-tools \
+ && yum install -y openssh-server sudo \
  && /usr/sbin/sshd-keygen
 
 RUN set -x \
