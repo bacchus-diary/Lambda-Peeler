@@ -64,7 +64,7 @@ gulp.task('test', ['build'], (cb) => {
     require('./main_bundle').handler('TEST', null, cb);
 });
 
-gulp.task('pack', ['test'], (cb) => {
+gulp.task('default', ['test'], (cb) => {
     const args = ['-r', 'main.zip', './main_bundle.js', './lib/', './share/'];
 
     const exclude = /aws\-sdk/;
