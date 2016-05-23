@@ -2,10 +2,11 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "fathens/centos-node43_opencv24"
-
-  config.vm.provider "virtualbox" do |vb|
-    vb.memory = 1024
+  config.vm.provider "docker" do |d|
+    d.build_dir = ".ve"
+    d.vagrant_vagrantfile = ".ve/Vagrantfile"
+    d.force_host_vm = true
+    d.has_ssh = true
   end
 
   if Vagrant.has_plugin?("vagrant-timezone")
