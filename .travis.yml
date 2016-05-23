@@ -19,6 +19,8 @@ install:
   - docker pull $DOCKER_IMAGE
 
 script:
+  - ln -s /var/task/lib ./
+  - ln- s /var/task/share ./
   - docker run -v $(pwd):$(pwd) -w $(pwd) -e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY $DOCKER_IMAGE /bin/sh -c 'PKG_CONFIG_PATH=/usr/local/opencv/lib/pkgconfig/ npm install opencv && (npm install || npm install) && $(npm bin)/gulp pack'
 
 after_success:
