@@ -31,6 +31,6 @@ after_success:
   - aws lambda update-function-code --function-name $AWS_LAMBDA_FUNC_NAME --s3-bucket $AWS_S3_BUCKET --s3-key $AWS_S3_FILEPATH --publish | tee result
   - VERSION=$(ruby -e 'require "json"; puts JSON.load(open("result"))["Version"]')
   - if [ -z $PRE ]; then PRE=$VERSION; CU='create'; else CU='update'; fi
-  - aws lambda $CU-alias --function-name $AWS_LAMBDA_FUNC_NAME --name $AWS_LAMBDA_ALIAS_NAME --function-version $VERSION &&\
-    aws lambda $CU-alias --function-name $AWS_LAMBDA_FUNC_NAME --name "${AWS_LAMBDA_ALIAS_NAME}_pre" --function-version $PRE &&\
-    curl -v -X POST -H "Authorization:token $GITHUB_OAUTH_TOKEN" https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs -d "{\"ref\":\"refs/tags/deploy/$VERSION\", \"sha\":\"$(git log HEAD -n1 --format=%H)\"}"
+  - aws lambda $CU-alias --function-name $AWS_LAMBDA_FUNC_NAME --name $AWS_LAMBDA_ALIAS_NAME --function-version $VERSION && \
+aws lambda $CU-alias --function-name $AWS_LAMBDA_FUNC_NAME --name "${AWS_LAMBDA_ALIAS_NAME}_pre" --function-version $PRE && \
+curl -v -X POST -H "Authorization:token $GITHUB_OAUTH_TOKEN" https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs -d "{\"ref\":\"refs/tags/deploy/$VERSION\", \"sha\":\"$(git log HEAD -n1 --format=%H)\"}"
