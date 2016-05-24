@@ -31,7 +31,15 @@ export class S3File {
             Bucket: this.bucketName,
             Key: path
         }));
-        fs.createWriteStream(dst).write(res.Body);
+        await new Promise((resolve, reject) => {
+          fs.createWriteStream(dst).write(res.Body, (error) => {
+            if (_.isNil(error)) {
+              resolve();
+            } else {
+              reject(error);
+            }
+          });
+        });
     }
 
     async upload(path: string, blob: Blob): Promise<void> {
