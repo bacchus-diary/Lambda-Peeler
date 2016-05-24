@@ -12,8 +12,9 @@ const s3 = new S3File("build-config");
 export const specifications = spec.describe({
     "Motion": {
         "フレームの読み込み": async () => {
-            const filepath = path.resolve("/tmp/motion.mp4");
-            await s3.download("bacchus-diary/Lambda-Peeler/test_data/pickled_cucumbers.mp4", filepath);
+            const s3path = "bacchus-diary/Lambda-Peeler/test_data/pickled_cucumbers.mp4";
+            const filepath = path.resolve(`/tmp/${path.basename(s3path)}`);
+            await s3.download(s3path, filepath);
             logger.debug(() => `Opening file: ${filepath}`);
             const vc = new CV.VideoCapture(filepath);
             const im = await toPromise<any>((cb) => {
