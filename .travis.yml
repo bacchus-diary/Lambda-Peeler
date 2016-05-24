@@ -27,7 +27,7 @@ script:
 
 after_success:
   - PRE=$(aws lambda get-alias --function-name $AWS_LAMBDA_FUNC_NAME --name $AWS_LAMBDA_ALIAS_NAME | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]')
-  - aws s3 cp $TRAVIS_BUILD_DIR/main.zip s3://$AWS_S3_BUCKET/$AWS_S3_FILEPATH
+  - aws s3 cp main.zip s3://$AWS_S3_BUCKET/$AWS_S3_FILEPATH
   - aws lambda update-function-code --function-name $AWS_LAMBDA_FUNC_NAME --s3-bucket $AWS_S3_BUCKET --s3-key $AWS_S3_FILEPATH --publish | tee result
   - VERSION=$(ruby -e 'require "json"; puts JSON.load(open("result"))["Version"]')
   - if [ -z $PRE ]; then PRE=$VERSION; CU='create'; else CU='update'; fi
