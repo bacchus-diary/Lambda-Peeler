@@ -1,10 +1,8 @@
 var gulp = require('gulp'),
 _ = require('lodash'),
-cp = require('child_process'),
 path = require('path'),
 fs = require('fs'),
 del = require('del'),
-zip = require('gulp-zip'),
 typings = require('gulp-typings'),
 webpack = require('gulp-webpack');
 
@@ -66,18 +64,18 @@ gulp.task('test', ['build'], (cb) => {
     require('./main_bundle').handler('TEST', null, cb);
 });
 
-gulp.task('pack', ['test'], () => {
+gulp.task('default', ['test'], (cb) => {
+    const args = ['-r', 'main.zip', './main_bundle.js', './lib/', './share/'];
+
     const exclude = /aws\-sdk/;
     const externals = require('./webpack.config.js').externals;
-
-    const sources = ['./*_bundle.js', 'lib', 'share'];
     fs.readdirSync('./node_modules')
     .filter((x) => !exclude.test(x))
     .filter((x) => externals.some((y) => y.test(x)))
-    .forEach((x) => sources.push(`./node_modules/${x}/**`));
-    console.log(`Packing: ${JSON.stringify(sources, null, 4)}`);
+    .forEach((x) => args.push(`./node_modules/${x}/`));
 
-    return gulp.src(sources, { base: './' })
-    .pipe(zip('main.zip'))
-    .pipe(gulp.dest('./'));
+    const ps = require('child_process').spawn('zip', args, { stdio: 'inherit' });
+    ps.on('close', (code) => {
+      cb(code);
+    });
 });
