@@ -22,8 +22,8 @@ export const specifications = spec.describe({
             });
             logger.debug(() => `Frame1: ${JSON.stringify(im)}`);
 
-            spec.expect(im.width).must_be(1080);
-            spec.expect(im.height).must_be(1920);
+            spec.expect(im.width()).must_be(1920);
+            spec.expect(im.height()).must_be(1080);
         }
     }
 });
