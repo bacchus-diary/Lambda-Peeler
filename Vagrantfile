@@ -7,6 +7,7 @@ Vagrant.configure(2) do |config|
     d.vagrant_vagrantfile = ".ve/Vagrantfile"
     d.force_host_vm = true
     d.has_ssh = true
+    d.create_args = ["--privileged"]
   end
 
   if Vagrant.has_plugin?("vagrant-timezone")
@@ -14,6 +15,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provision "shell", inline: <<-SHELL
+    yum install -y ntpdate && ntpdate -bv ntp.nict.jp
     su - vagrant -c 'cd /vagrant && npm uninstall opencv'
     su - vagrant -c 'cd /vagrant && PKG_CONFIG_PATH=/var/task/lib/pkgconfig/ npm install opencv'
   SHELL
