@@ -21,9 +21,8 @@ install:
   - docker pull $DOCKER_IMAGE
 
 script:
-  - ln -s /var/task/lib ./
-  - ln -s /var/task/share ./
   - docker run -v $(pwd):$(pwd) -w $(pwd) -e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY $DOCKER_IMAGE /bin/sh -c 'PKG_CONFIG_PATH=/var/task/lib/pkgconfig/ npm install opencv && (npm install || npm install) && LD_LIBRARY_PATH=/var/task/lib/ $(npm bin)/gulp'
+  - ln -s /var/task/lib ./ && zip -r main.zip ./lib/
 
 after_success:
   - PRE=$(aws lambda get-alias --function-name $AWS_LAMBDA_FUNC_NAME --name $AWS_LAMBDA_ALIAS_NAME | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]')
