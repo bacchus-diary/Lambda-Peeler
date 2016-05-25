@@ -29,3 +29,5 @@ rename() {
 }
 rename $AWS_LAMBDA_ALIAS_NAME $VERSION
 rename "${AWS_LAMBDA_ALIAS_NAME}_pre" $PRE
+
+echo $VERSION

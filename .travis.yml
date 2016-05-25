@@ -19,7 +19,7 @@ install:
 script:
   - docker run -v $(pwd):$(pwd) -w $(pwd) -e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY $DOCKER_IMAGE /bin/sh -c 'PKG_CONFIG_PATH=/var/task/lib/pkgconfig/ npm install opencv && (npm install || npm install) && LD_LIBRARY_PATH=/var/task/lib/ $(npm bin)/gulp'
   - ln -s /var/task/lib ./ && zip -r main.zip ./lib/
-  - ./lambda_update.sh Peeler:$AWS_LAMBDA_ALIAS_NAME build-config/$TRAVIS_REPO_SLUG/main.zip
 
 after_success:
-  - curl -v -X POST -H "Authorization:token $GITHUB_OAUTH_TOKEN" https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs -d "{\"ref\":\"refs/tags/deploy/$VERSION\", \"sha\":\"$(git log HEAD -n1 --format=%H)\"}"
+  - VERSION=$(./lambda_update.sh Peeler:$AWS_LAMBDA_ALIAS_NAME build-config/$TRAVIS_REPO_SLUG/main.zip)
+  - [ -n $VERSION ] && curl -v -X POST -H "Authorization:token $GITHUB_OAUTH_TOKEN" https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs -d "{\"ref\":\"refs/tags/deploy/$VERSION\", \"sha\":\"$(git log HEAD -n1 --format=%H)\"}"
