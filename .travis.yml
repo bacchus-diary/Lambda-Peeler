@@ -1,4 +1,4 @@
-language: ruby
+language: python
 services:
   - docker
 
@@ -9,25 +9,16 @@ branches:
     - /^feature\/\w+/
 env:
   global:
-    - AWS_LAMBDA_FUNC_NAME='Peeler'
     - AWS_LAMBDA_ALIAS_NAME=$(if [ "$TRAVIS_BRANCH" == 'master' ]; then echo Production; else echo Beta; fi)
     - DOCKER_IMAGE=fathens/docker-lambda-opencv24
 
 install:
   - sudo easy_install pip && sudo pip install awscli
-  - gem install json --no-document
   - docker pull $DOCKER_IMAGE
 
 script:
-  - ln -s /var/task/lib ./
-  - ln -s /var/task/share ./
-  - docker run -v $(pwd):$(pwd) -w $(pwd) -e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY $DOCKER_IMAGE /bin/sh -c 'PKG_CONFIG_PATH=/var/task/lib/pkgconfig/ npm install opencv && (npm install || npm install) && LD_LIBRARY_PATH=/var/task/lib/ $(npm bin)/gulp'
+  - docker run -v $(pwd):$(pwd) -w $(pwd) -e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY $DOCKER_IMAGE /bin/sh -c 'PKG_CONFIG_PATH=/var/task/lib/pkgconfig/ npm install opencv && (npm install || npm install) && LD_LIBRARY_PATH=/var/task/lib/ $(npm bin)/gulp && ln -s /var/task/lib ./ && zip -r main.zip ./lib/'
+  - export VERSION=$(./lambda_update.sh Peeler:$AWS_LAMBDA_ALIAS_NAME build-config/$TRAVIS_REPO_SLUG/main.zip)
 
 after_success:
-  - PRE=$(aws lambda get-alias --function-name $AWS_LAMBDA_FUNC_NAME --name $AWS_LAMBDA_ALIAS_NAME | ruby -e 'require "json"; puts JSON.load($stdin)["FunctionVersion"]')
-  - aws lambda update-function-code --function-name $AWS_LAMBDA_FUNC_NAME --zip-file fileb://$TRAVIS_BUILD_DIR/main.zip --publish | tee result
-  - VERSION=$(ruby -e 'require "json"; puts JSON.load(open("result"))["Version"]')
-  - if [ -z $PRE ]; then PRE=$VERSION; CU='create'; else CU='update'; fi
-  - aws lambda $CU-alias --function-name $AWS_LAMBDA_FUNC_NAME --name $AWS_LAMBDA_ALIAS_NAME --function-version $VERSION
-  - aws lambda $CU-alias --function-name $AWS_LAMBDA_FUNC_NAME --name "${AWS_LAMBDA_ALIAS_NAME}_pre" --function-version $PRE
-  - curl -v -X POST -H "Authorization:token $GITHUB_OAUTH_TOKEN" https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs -d "{\"ref\":\"refs/tags/deploy/$VERSION\", \"sha\":\"$(git log HEAD -n1 --format=%H)\"}"
+  - curl -X POST -H "Authorization:token $GITHUB_OAUTH_TOKEN" https://api.github.com/repos/$TRAVIS_REPO_SLUG/git/refs -d "{\"ref\":\"refs/tags/deploy/$VERSION\", \"sha\":\"$(git log HEAD -n1 --format=%H)\"}"
