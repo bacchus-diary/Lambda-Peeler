@@ -1,4 +1,4 @@
-FROM fathens/docker-lambda-opencv24
+FROM fathens/docker-lambda-peeler
 
 RUN set -x \
  && yum update -y \
