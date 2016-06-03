@@ -16,6 +16,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision "shell", inline: <<-SHELL
     yum install -y ntpdate && ntpdate -bv ntp.nict.jp
+    su - vagrant -c 'cd /vagrant && echo "export PATH=$PATH:$(npm bin)" >> ~/.bashrc'
     su - vagrant -c 'cd /vagrant && npm install'
   SHELL
 end
