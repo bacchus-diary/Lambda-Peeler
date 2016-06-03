@@ -29,7 +29,9 @@
     "webpack": "^1.13.0"
   },
   "scripts": {
-    "test": "gulp test"
+    "test-only": "gulp test-only",
+    "test": "gulp test",
+    "zip": "gulp"
   },
   "author": "Kunio Sawatani",
   "license": "GPL-3.0"
