@@ -16,7 +16,6 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision "shell", inline: <<-SHELL
     yum install -y ntpdate && ntpdate -bv ntp.nict.jp
-    su - vagrant -c 'cd /vagrant && npm uninstall opencv'
-    su - vagrant -c 'cd /vagrant && PKG_CONFIG_PATH=/var/task/lib/pkgconfig/ npm install opencv'
+    su - vagrant -c 'cd /vagrant && npm install'
   SHELL
 end
