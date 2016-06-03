@@ -4,6 +4,7 @@ path = require('path'),
 fs = require('fs'),
 del = require('del'),
 zip = require('gulp-zip'),
+runSeq = require('run-sequence'),
 typings = require('gulp-typings'),
 webpack = require('gulp-webpack');
 
@@ -61,8 +62,12 @@ gulp.task('inject-tests', (cb) => {
     });
 });
 
-gulp.task('test', ['build'], (cb) => {
+gulp.task('test-only', [], (cb) => {
     require('./main_bundle').handler('TEST', null, cb);
+});
+
+gulp.task('test', ['build'], (cb) => {
+    runSeq('test-only', cb);
 });
 
 gulp.task('default', ['test'], () => {
