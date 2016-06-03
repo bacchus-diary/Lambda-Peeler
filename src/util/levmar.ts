@@ -17,24 +17,25 @@ const C_doubleArray = ArrayType(C_double);
 
 const liblevmar = ffi.Library("liblevmar", {
     "dlevmar_dif": [C_void, [
-          ffi.Function(C_void, [C_doubleArray, C_doubleArray, C_int, C_int, C_voidPtr]),
-          C_doubleArray, C_doublePtr, C_int, C_int, C_int, C_doublePtr, C_doublePtr, C_doublePtr, C_doublePtr, C_voidPtr]]
+        ffi.Function(C_void, [C_doubleArray, C_doubleArray, C_int, C_int, C_voidPtr]),
+        C_doubleArray, C_doublePtr, C_int, C_int, C_int, C_doublePtr, C_doublePtr, C_doublePtr, C_doublePtr, C_voidPtr]
+    ]
 });
 
 function toCArray<T>(array: Array<T>, C_type): any {
-  const c_array = new C_type(array.length);
-  _.range(array.length).forEach(index => {
-      c_array[index] = array[index];
-  });
-  return c_array;
+    const c_array = new C_type(array.length);
+    _.range(array.length).forEach(index => {
+        c_array[index] = array[index];
+    });
+    return c_array;
 }
 
 function fromCArray<T>(c_array, length: number): Array<T> {
-  const array = new Array<T>(length);
-  _.range(array.length).forEach(index => {
-      array[index] = c_array[index];
-  })
-  return array;
+    const array = new Array<T>(length);
+    _.range(array.length).forEach(index => {
+        array[index] = c_array[index];
+    })
+    return array;
 }
 
 export async function dif(params: Array<number>, numCalcs: number, calc: (p: Array<number>, index: number) => number, iterateMax: number = 1000): Promise<Array<number>> {
