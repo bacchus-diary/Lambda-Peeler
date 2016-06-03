@@ -18,11 +18,11 @@ export const specifications = spec.describe({
                 const v = p[1] * point.x + p[0] - point.y
                 logger.debug(() => `Calculated diff ${v}: ${JSON.stringify(p)}, ${JSON.stringify(point)}`);
                 return v * v
-            });
+            }, 300);
             logger.debug(() => `Result of dif: ${JSON.stringify(res)}`);
 
-            spec.expect(res[0]).must_be(0.806997);
-            spec.expect(res[1]).must_be(0.188845);
+            spec.nearly_equal(res[0], 0.799952932);
+            spec.nearly_equal(res[1], 0.199988709);
         }
     }
 });

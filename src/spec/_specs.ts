@@ -92,9 +92,17 @@ export class Expect<T> {
     }
 }
 
-export function nearly_equal(actual: number, expected: number, p: number) {
+export function nearly_equal(actual: number, expected: number, p: number = null) {
+    var e = 0;
+    if (_.isNil(p)) {
+      const exp = expected.toString();
+      const point = exp.indexOf(".");
+      e = 5 / Math.pow(10, point < 0 ? 1 : exp.length - point);
+    } else {
+      e = expected * p;
+    }
     const diff = Math.abs(actual - expected);
-    if (expected * p < diff) {
-        throw `"${actual}" nearly equal to "${expected}"±"${p}"`;
+    if (e < diff) {
+        throw `"${actual}" nearly equal to "${expected}"±"${e}"`;
     }
 }
