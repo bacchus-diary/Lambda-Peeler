@@ -7,6 +7,7 @@ Vagrant.configure(2) do |config|
     d.vagrant_vagrantfile = ".ve/Vagrantfile"
     d.force_host_vm = true
     d.has_ssh = true
+    d.pull = true
     d.create_args = ["--privileged"]
   end
 
