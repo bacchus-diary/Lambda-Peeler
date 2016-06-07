@@ -4,6 +4,8 @@ path = require('path'),
 fs = require('fs'),
 del = require('del'),
 zip = require('gulp-zip'),
+shell = require('gulp-shell'),
+rename = require('gulp-rename'),
 runSeq = require('run-sequence'),
 typings = require('gulp-typings'),
 webpack = require('gulp-webpack');
@@ -62,11 +64,19 @@ gulp.task('inject-tests', (cb) => {
     });
 });
 
+gulp.task('haskell-build', shell.task('stack build'));
+
+gulp.task('haskell', ['haskell-build'], () => {
+    return gulp.src('.stack-work/install/**/lib/**/*.so')
+    .pipe(rename({dirname: ''}))
+    .pipe(gulp.dest('/var/task/lib'));
+});
+
 gulp.task('test-only', [], (cb) => {
     require('./main_bundle').handler('TEST', null, cb);
 });
 
-gulp.task('test', ['build'], (cb) => {
+gulp.task('test', ['build', 'haskell'], (cb) => {
     runSeq('test-only', cb);
 });
 
