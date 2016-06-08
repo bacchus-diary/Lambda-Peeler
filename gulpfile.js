@@ -8,7 +8,7 @@ shell = require('gulp-shell'),
 rename = require('gulp-rename'),
 runSeq = require('run-sequence'),
 typings = require('gulp-typings'),
-webpack = require('gulp-webpack');
+webpack = require('webpack-stream');
 
 function filesRecursive(parent, regex, callback) {
     fs.readdir(parent, (error, names) => {
