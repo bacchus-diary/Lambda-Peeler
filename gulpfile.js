@@ -64,8 +64,10 @@ gulp.task('inject-tests', (cb) => {
     });
 });
 
-gulp.task('haskell-build', shell.task('stack --install-ghc --allow-different-user build'));
-gulp.task('haskell', ['haskell-build'], shell.task('haskell/install.sh /var/task/lib'));
+gulp.task('haskell', shell.task([
+    "stack --install-ghc --allow-different-user build",
+    "haskell/install.sh /var/task/lib"
+]));
 
 gulp.task('test-only', [], (cb) => {
     require('./main_bundle').handler('TEST', null, cb);
@@ -90,4 +92,8 @@ gulp.task('pack', ['test'], () => {
     .pipe(zip('main.zip'))
     .pipe(gulp.dest('./'));
 });
-gulp.task('default', ['pack'], shell.task(["ln -s /var/task/lib ./", "zip -ry main.zip ./lib/"]));
+
+gulp.task('default', ['pack'], shell.task([
+    "ln -s /var/task/lib ./",
+    "zip -ry main.zip ./lib/"
+]));
