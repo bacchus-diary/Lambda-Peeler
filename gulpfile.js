@@ -75,7 +75,7 @@ gulp.task('test', ['build', 'haskell'], (cb) => {
     runSeq('test-only', cb);
 });
 
-gulp.task('default', ['test'], () => {
+gulp.task('pack', ['test'], () => {
     const exclude = /aws\-sdk/;
     const externals = require('./webpack.config.js').externals;
 
@@ -90,3 +90,4 @@ gulp.task('default', ['test'], () => {
     .pipe(zip('main.zip'))
     .pipe(gulp.dest('./'));
 });
+gulp.task('default', ['pack'], shell.task(["ln -s /var/task/lib ./", "zip -ry main.zip ./lib/"]));
