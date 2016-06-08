@@ -15,7 +15,6 @@ module.exports = {
     externals: [
         /^ffi$/,
         /^ref$/,
-        /^opencv$/,
         /^aws\-sdk$/
     ],
     target: 'node',
