@@ -64,7 +64,7 @@ gulp.task('inject-tests', (cb) => {
     });
 });
 
-gulp.task('haskell-build', shell.task('stack build --allow-different-user'));
+gulp.task('haskell-build', shell.task('stack --install-ghc --allow-different-user build'));
 gulp.task('haskell', ['haskell-build'], shell.task('haskell/install.sh /var/task/lib'));
 
 gulp.task('test-only', [], (cb) => {
