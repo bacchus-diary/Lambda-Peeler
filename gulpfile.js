@@ -65,12 +65,7 @@ gulp.task('inject-tests', (cb) => {
 });
 
 gulp.task('haskell-build', shell.task('stack build'));
-
-gulp.task('haskell', ['haskell-build'], () => {
-    return gulp.src('.stack-work/install/**/lib/**/*.so')
-    .pipe(rename({dirname: ''}))
-    .pipe(gulp.dest('/var/task/lib'));
-});
+gulp.task('haskell', ['haskell-build'], shell.task('haskell/install.sh /var/task/lib'));
 
 gulp.task('test-only', [], (cb) => {
     require('./main_bundle').handler('TEST', null, cb);

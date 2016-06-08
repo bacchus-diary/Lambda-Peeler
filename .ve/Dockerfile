@@ -1,4 +1,4 @@
-FROM fathens/docker-lambda-peeler
+FROM fathens/docker-lambda-peeler:haskell
 
 RUN set -x \
  && yum update -y \
@@ -24,5 +24,8 @@ RUN set -x \
 RUN set -x \
   && echo 'export PKG_CONFIG_PATH=/var/task/lib/pkgconfig' >> ~vagrant/.bashrc \
   && echo 'export LD_LIBRARY_PATH=/var/task/lib' >> ~vagrant/.bashrc
+
+RUN set -x \
+  && su - vagrant -c 'stack setup'
 
 CMD ["/usr/sbin/sshd", "-D"]
