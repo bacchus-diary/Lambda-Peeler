@@ -17,7 +17,7 @@ install:
   - docker pull $DOCKER_IMAGE
 
 script:
-  - docker run -v $(pwd):$(pwd) -w $(pwd) -e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e PKG_CONFIG_PATH=/var/task/lib/pkgconfig -e LD_LIBRARY_PATH=/var/task/lib $DOCKER_IMAGE /bin/sh -c 'stack --allow-different-user setup && (npm install || npm install) && npm run zip && ln -s /var/task/lib ./ && zip -r main.zip ./lib/'
+  - docker run -v $(pwd):$(pwd) -w $(pwd) -e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e PKG_CONFIG_PATH=/var/task/lib/pkgconfig -e LD_LIBRARY_PATH=/var/task/lib $DOCKER_IMAGE /bin/sh -c 'stack --allow-different-user setup && (npm install || npm install) && npm run zip && ln -s /var/task/lib ./ && zip -ry main.zip ./lib/'
   - export VERSION=$(./lambda_update.sh Peeler:$AWS_LAMBDA_ALIAS_NAME build-config/$TRAVIS_REPO_SLUG/main.zip)
 
 after_success:
