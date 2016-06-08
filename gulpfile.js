@@ -95,5 +95,5 @@ gulp.task('pack', ['test'], () => {
 
 gulp.task('default', ['pack'], shell.task([
     "ln -s /var/task/lib ./",
-    "zip -ry main.zip ./lib/"
+    "zip -ry main.zip ./lib/*"
 ]));
