@@ -4,7 +4,7 @@
 static void my_enter(void) __attribute__((constructor));
 static void my_enter(void)
 {
-  static char *argv[] = { "libEval.so", 0 }, **argv_ = argv;
+  static char *argv[] = { "libHSPeeler.so", 0 }, **argv_ = argv;
   static int argc = 1;
   printf("Entering Haskell Runtime\n");
   hs_init(&argc, &argv_);
