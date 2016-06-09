@@ -6,20 +6,20 @@ const ref = require("ref");
 
 const logger = new Logger("HaskellSpec");
 
-const C_double = ref.types.double;
-const C_doublePtr = ref.refType(C_double);
+const C_stringPtr = ref.refType(ref.types.CString);
 
 const peeler = ffi.Library("libHSPeeler", {
-    "calcSin": [C_double, [C_double]]
+    "start": ["string", ["string"]]
 });
 
 export const specifications = spec.describe({
     "Haskell": {
-        "sin": async () => {
-            const result = peeler.calcSin(0.5);
+        "start": () => {
+            const original = "Some text";
+            const result = peeler.start(original);
             logger.debug(() => `Result of dif: ${JSON.stringify(result)}`);
 
-            spec.nearly_equal(result, 0.479425539);
+            spec.expect(result).must_be(original);
         }
     }
 });
