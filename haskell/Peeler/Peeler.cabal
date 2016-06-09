@@ -14,8 +14,16 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Facade
-  build-depends:       base
+  exposed-modules:     Facade, LevMar
+  build-depends:       base, hspec
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-shared-options:  -threaded -O2 -dynamic -shared -lHSrts_thr-ghc7.10.3 -L/var/task/lib -llevmar -o libHSPeeler.so src/hsbracket.c
+
+test-suite All
+  type:                exitcode-stdio-1.0
+  default-language:    Haskell2010
+  build-depends:       base, hspec, Peeler
+  hs-source-dirs:      src/test
+  main-is:             Spec.hs
+  ghc-options:         -threaded

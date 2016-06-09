@@ -1,4 +1,4 @@
-module LevMar where
+module LevMar(levmarDif) where
 
 import Foreign.C.Types
 import Foreign.Ptr
