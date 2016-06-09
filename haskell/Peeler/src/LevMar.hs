@@ -11,7 +11,7 @@ type MeasureFunc = Ptr CDouble -> Ptr CDouble -> CInt -> CInt -> Ptr CVoid -> IO
 
 foreign import ccall "wrapper" wrapper :: MeasureFunc -> IO (FunPtr MeasureFunc)
 
-foreign import ccall "levmar dlevmar_dif" dlevmar_dif ::
+foreign import ccall "dlevmar_dif" dlevmar_dif ::
   FunPtr MeasureFunc ->
   Ptr CDouble -> Ptr CDouble -> CInt -> CInt -> CInt ->
   Ptr CDouble -> Ptr CDouble -> Ptr CDouble -> Ptr CDouble -> Ptr CVoid -> IO ()
