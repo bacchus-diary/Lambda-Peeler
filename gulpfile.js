@@ -94,5 +94,5 @@ gulp.task('pack', ['test'], () => {
 });
 
 gulp.task('default', ['pack'], shell.task([
-    "DIR=$(pwd) && cd /var/task/lib && zip -ryD $DIR/main.zip lib"
+    "DIR=$(pwd) && cd /var/task && zip -ryD $DIR/main.zip lib"
 ]));
