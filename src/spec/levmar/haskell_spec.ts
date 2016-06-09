@@ -1,5 +1,4 @@
 import * as spec from "../_specs";
-import * as LM from "../../util/levmar";
 import {Logger} from "../../util/logging";
 
 const ffi = require("ffi");
