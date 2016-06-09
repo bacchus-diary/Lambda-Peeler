@@ -17,15 +17,15 @@ foreign import ccall "levmar dlevmar_dif" dlevmar_dif ::
   Ptr CDouble -> Ptr CDouble -> Ptr CDouble -> Ptr CDouble -> Ptr CVoid -> IO ()
 
 levmarDif :: Int -> ([Double] -> [Double]) -> Int -> [Double] -> IO [Double]
-levmarDif c meas max src = do
-  s <- newArray $ map realToFrac src
-  m <- wrapper measure
-  dlevmar_dif m s nullPtr (fromIntegral $ length src) (fromIntegral c) (fromIntegral max) nullPtr nullPtr nullPtr nullPtr nullPtr
-  freeHaskellFunPtr m
-  r <- peekArray (length src) s
-  free s
+levmarDif n calc max src = do
+  params <- newArray $ map realToFrac src
+  func <- wrapper calcDiff
+  dlevmar_dif func params nullPtr (fromIntegral $ length src) (fromIntegral n) (fromIntegral max) nullPtr nullPtr nullPtr nullPtr nullPtr
+  freeHaskellFunPtr func
+  r <- peekArray (length src) params
+  free params
   return $ map realToFrac r
   where
-    measure p hx m n adata = do
-      a <- peekArray (length src) p
-      pokeArray hx $ map realToFrac $ meas $ map realToFrac a
+    calcDiff params hx m n adata = do
+      a <- peekArray (length src) params
+      pokeArray hx $ map realToFrac $ calc $ map realToFrac a
