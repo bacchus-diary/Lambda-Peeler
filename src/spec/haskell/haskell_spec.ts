@@ -6,10 +6,10 @@ const ref = require("ref");
 
 const logger = new Logger("HaskellSpec");
 
-const C_stringPtr = ref.refType(ref.types.CString);
+const C_string = ref.types.CString;
 
 const peeler = ffi.Library("libHSPeeler", {
-    "start": ["string", ["string"]]
+    "start": [C_string, [C_string]]
 });
 
 export const specifications = spec.describe({
