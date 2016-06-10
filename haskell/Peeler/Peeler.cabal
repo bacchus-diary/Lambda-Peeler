@@ -19,7 +19,7 @@ library
   build-depends:       base
   hs-source-dirs:      src
   c-sources:           src/hsbracket.c
-  ghc-shared-options:  -threaded -O2 -optc-O3 -optc-ffast-math -fexcess-precision
+  ghc-shared-options:  -threaded -with-rtsopts=-N -O2 -optc-O3 -optc-ffast-math -fexcess-precision
   extra-lib-dirs:      /var/task/lib
   extra-libraries:     levmar
 
