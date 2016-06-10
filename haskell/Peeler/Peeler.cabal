@@ -21,7 +21,7 @@ library
   c-sources:           src/hsbracket.c
   ghc-shared-options:  -threaded -O2 -optc-O3 -optc-ffast-math -fexcess-precision
   extra-lib-dirs:      /var/task/lib
-  extra-libraries:     ffi, levmar
+  extra-libraries:     levmar
 
 test-suite AllSpecs
   type:                exitcode-stdio-1.0
