@@ -29,6 +29,6 @@ test-suite AllSpecs
   build-depends:       base, hspec
   hs-source-dirs:      src, test
   main-is:             Spec.hs
-  ghc-options:         -threaded
+  ghc-options:         -threaded -with-rtsopts=-M512m
   extra-lib-dirs:      /var/task/lib
   extra-libraries:     levmar
