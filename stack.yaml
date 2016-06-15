@@ -1,0 +1,5 @@
+flags: {}
+packages:
+- haskell/Peeler
+extra-deps: []
+resolver: lts-6.2

@@ -1,4 +1,4 @@
-FROM fathens/docker-lambda-opencv24
+FROM fathens/docker-lambda-peeler:haskell
 
 RUN set -x \
  && yum update -y \
@@ -20,5 +20,12 @@ RUN set -x \
   && chmod 0440 /etc/sudoers.d/vagrant \
   && cat /etc/sudoers | sed 's/^\(Defaults\s\+requiretty\)/#\1/' > /etc/sudoers.sed \
   && mv -vf /etc/sudoers.sed /etc/sudoers
+
+RUN set -x \
+  && echo 'export PKG_CONFIG_PATH=/var/task/lib/pkgconfig' >> ~vagrant/.bashrc \
+  && echo 'export LD_LIBRARY_PATH=/var/task/lib' >> ~vagrant/.bashrc
+
+RUN set -x \
+  && su - vagrant -c 'stack setup'
 
 CMD ["/usr/sbin/sshd", "-D"]

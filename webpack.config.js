@@ -13,7 +13,8 @@ module.exports = {
         pathinfo: false // show module paths in the bundle, handy for debugging
     },
     externals: [
-        /^opencv$/,
+        /^ffi$/,
+        /^ref$/,
         /^aws\-sdk$/
     ],
     target: 'node',

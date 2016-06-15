@@ -4,8 +4,11 @@ path = require('path'),
 fs = require('fs'),
 del = require('del'),
 zip = require('gulp-zip'),
+shell = require('gulp-shell'),
+rename = require('gulp-rename'),
+runSeq = require('run-sequence'),
 typings = require('gulp-typings'),
-webpack = require('gulp-webpack');
+webpack = require('webpack-stream');
 
 function filesRecursive(parent, regex, callback) {
     fs.readdir(parent, (error, names) => {
@@ -61,11 +64,20 @@ gulp.task('inject-tests', (cb) => {
     });
 });
 
-gulp.task('test', ['build'], (cb) => {
+gulp.task('haskell', shell.task([
+    "stack --install-ghc --allow-different-user test",
+    "haskell/install.sh /var/task/lib"
+]));
+
+gulp.task('test-only', [], (cb) => {
     require('./main_bundle').handler('TEST', null, cb);
 });
 
-gulp.task('default', ['test'], () => {
+gulp.task('test', ['build', 'haskell'], (cb) => {
+    runSeq('test-only', cb);
+});
+
+gulp.task('pack', ['test'], () => {
     const exclude = /aws\-sdk/;
     const externals = require('./webpack.config.js').externals;
 
@@ -80,3 +92,7 @@ gulp.task('default', ['test'], () => {
     .pipe(zip('main.zip'))
     .pipe(gulp.dest('./'));
 });
+
+gulp.task('default', ['pack'], shell.task([
+    "DIR=$(pwd) && cd /var/task && zip -ryD $DIR/main.zip lib"
+]));
