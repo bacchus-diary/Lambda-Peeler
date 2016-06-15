@@ -17,8 +17,8 @@ library
   exposed-modules:     Facade
   default-language:    Haskell2010
   build-depends:       base
-  hs-source-dirs:      src
   c-sources:           src/hsbracket.c
+  hs-source-dirs:      src/main
   ghc-shared-options:  -threaded -with-rtsopts=-N -O2 -optc-O3 -optc-ffast-math -fexcess-precision
   extra-lib-dirs:      /var/task/lib
   extra-libraries:     levmar
@@ -26,9 +26,7 @@ library
 test-suite AllSpecs
   type:                exitcode-stdio-1.0
   default-language:    Haskell2010
-  build-depends:       base, hspec
-  hs-source-dirs:      src, test
+  build-depends:       base, hspec, Peeler
+  hs-source-dirs:      src/test
   main-is:             Spec.hs
   ghc-options:         -threaded -with-rtsopts=-M512m
-  extra-lib-dirs:      /var/task/lib
-  extra-libraries:     levmar
