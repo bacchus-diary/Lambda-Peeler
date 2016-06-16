@@ -14,14 +14,16 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Facade, LevMar, CVCore
+  exposed-modules:     Facade, LevMar, OpenCV.Basic
   default-language:    Haskell2010
   build-depends:       base
                      , inline-c-cpp
                      , template-haskell
+                     , bytestring
+                     , vector
   ghc-options:         -pgmlg++
   hs-source-dirs:      src/main
-  c-sources:           src/main/hsbracket.c, src/main/CVCore.cpp
+  c-sources:           src/main/hsbracket.c, src/main/OpenCV/Basic.cpp
   ghc-shared-options:  -threaded -with-rtsopts=-N -O2 -optc-O3 -optc-ffast-math -fexcess-precision
   include-dirs:        /var/task/include
   extra-lib-dirs:      /var/task/lib

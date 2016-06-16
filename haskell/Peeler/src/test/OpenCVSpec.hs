@@ -1,11 +1,12 @@
 module OpenCVSpec where
 
 import Test.Hspec
-import CVCore
+import OpenCV.Basic
 
 spec :: Spec
 spec = do
   describe "OpenCV" $ do
-    it "shout" $ do
-      result <- shout 27
-      result `shouldBe` 3
+    it "feature" $ do
+      img <- readImage "Some"
+      detect "Some"
+      print img
