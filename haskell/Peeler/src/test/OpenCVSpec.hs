@@ -1,12 +1,15 @@
 module OpenCVSpec where
 
 import Test.Hspec
-import OpenCV.Basic
+
+import Foreign.C.String
+
+import Facade
 
 spec :: Spec
 spec = do
-  describe "OpenCV" $ do
-    it "feature" $ do
-      img <- readImage "Some"
-      detect "Some"
-      print img
+    describe "OpenCV" $ do
+        it "start" $ do
+            withCString "resources/test/opencv/pickled_cucumbers.mp4" $ \c_str ->
+                start c_str
+            print "done."

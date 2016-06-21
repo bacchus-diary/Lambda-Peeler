@@ -3,7 +3,16 @@ module Facade where
 import Foreign.C.Types
 import Foreign.C.String
 
-foreign export ccall start :: CString -> CString
+foreign import ccall "loadVideo" loadVideo :: CString -> IO ()
 
-start :: CString -> CString
-start moviePath = moviePath
+foreign export ccall start :: CString -> IO CString
+start :: CString -> IO CString
+start moviePath = do
+    loadVideo moviePath
+    return moviePath
+
+foreign export ccall compareKeypoints :: CInt -> IO ()
+compareKeypoints :: CInt -> IO ()
+compareKeypoints count = do
+    print "Entering 'compareKeypoints'..."
+    print count
