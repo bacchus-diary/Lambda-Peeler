@@ -15,6 +15,7 @@ env:
 before_install:
   - curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
   - sudo apt-get install git-lfs
+  - git lfs version
   - git lfs update
   - git lfs ls-files
   - git lfs pull
