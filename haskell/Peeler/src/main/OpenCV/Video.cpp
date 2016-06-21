@@ -21,9 +21,12 @@ void loadVideo(char *videoFile) {
             exit(EXIT_FAILURE);
         }
         Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create(400);
+
         vector<cv::KeyPoint> previousKeypoints, currentKeypoints;
         Mat previousFrame, currentFrame;
-        while (capture.read(currentFrame)) {
+
+        int i = 0;
+        while (i < 10 && capture.read(currentFrame)) {
             detector->detect(currentFrame, currentKeypoints);
             printf("Detected points: %d\n", currentKeypoints.size());
             if (previousKeypoints.size() > 0) {
@@ -32,6 +35,7 @@ void loadVideo(char *videoFile) {
             }
             previousFrame = currentFrame;
             previousKeypoints = currentKeypoints;
+            i++;
         }
         capture.release();
 }
