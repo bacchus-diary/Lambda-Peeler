@@ -18,7 +18,7 @@ const s3 = new S3File("build-config");
 export const specifications = spec.describe({
     "Haskell": {
         "start": async () => {
-            require('child_process').spawn("ldd $(find /var/task/lib -type f -name 'libHSPeeler.so') | grep -v /var/task", [], {stdio: 'inherit'});
+            require('child_process').spawn('./check_ldd.sh', [], {stdio: 'inherit'});
 
             const s3path = "bacchus-diary/Lambda-Peeler/test_data/pickled_cucumbers.mp4";
             const filepath = path.resolve(`/tmp/${path.basename(s3path)}`);
