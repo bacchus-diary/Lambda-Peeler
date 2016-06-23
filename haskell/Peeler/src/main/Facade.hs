@@ -4,11 +4,12 @@ import Foreign.C.Types
 import Foreign.C.String
 
 foreign import ccall "loadVideo" loadVideo :: CString -> IO ()
+foreign import ccall "sampleOut" sampleOut :: CString -> IO ()
 
 foreign export ccall start :: CString -> IO CString
 start :: CString -> IO CString
 start moviePath = do
-    loadVideo moviePath
+    sampleOut moviePath
     return moviePath
 
 foreign export ccall compareKeypoints :: CInt -> IO ()
