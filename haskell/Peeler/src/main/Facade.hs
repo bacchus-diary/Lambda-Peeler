@@ -8,7 +8,7 @@ foreign import ccall "loadVideo" loadVideo :: CString -> IO ()
 foreign export ccall start :: CString -> IO CString
 start :: CString -> IO CString
 start moviePath = do
-    loadVideo moviePath
+    compareKeypoints 0
     return moviePath
 
 foreign export ccall compareKeypoints :: CInt -> IO ()
