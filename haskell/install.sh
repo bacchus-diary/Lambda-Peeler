@@ -13,7 +13,7 @@ do
     echo "Adding '$EXTRA_LIB' to $target"
     patchelf --add-needed $EXTRA_LIB $target
 
-    ldd $target | awk '/\/\.stack|gcc|c\+\+/ {print $(NF-1)}' | while read lib
+    ldd $target | awk '{print $(NF-1)}' | grep /.stack | while read lib
     do
         cp -vu $lib $target_dir
     done
