@@ -8,6 +8,8 @@
 #include "opencv2/xfeatures2d.hpp"
 #include "opencv2/videoio.hpp"
 
+#include "Facade_stub.h"
+
 using namespace cv;
 using namespace std;
 
@@ -58,6 +60,7 @@ extern "C" {
             if (previous.keypoints.size() > 0) {
                 printf("Comparing previous frame...\n");
                 MatchPoints mp = matchPoints(previous, current);
+                compareKeypoints(i);
             }
             previous = current;
             i++;
