@@ -30,6 +30,7 @@ extern "C" {
 
         int i = 0;
         while (i < 10 && capture.read(frame)) {
+            detector->detectAndCompute(frame, noArray(), keypoints, desc);
             printf("Detected points: %d\n", keypoints.size());
             compareKeypoints(i);
             i++;
