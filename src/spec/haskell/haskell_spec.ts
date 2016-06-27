@@ -18,16 +18,12 @@ const s3 = new S3File("build-config");
 export const specifications = spec.describe({
     "Haskell": {
         "start": async () => {
-            require('child_process').spawn('./check_ldd.sh', [], {stdio: 'inherit'});
-
             const s3path = "bacchus-diary/Lambda-Peeler/test_data/pickled_cucumbers.mp4";
             const filepath = path.resolve(`/tmp/${path.basename(s3path)}`);
             await s3.download(s3path, filepath);
             logger.debug(() => `Loading video: ${filepath}`);
-            const result = peeler.start(filepath);
-            logger.debug(() => `Result of start: ${JSON.stringify(result)}`);
 
-            spec.expect(result).must_be(filepath);
+            require('child_process').spawn('./haskell/Peeler/peeler', [filepath], {stdio: 'inherit'});
         }
     }
 });
