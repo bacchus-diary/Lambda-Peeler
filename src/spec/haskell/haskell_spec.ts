@@ -8,11 +8,6 @@ const ref = require("ref");
 
 const logger = new Logger("HaskellSpec");
 
-const C_string = ref.types.CString;
-
-const peeler = ffi.Library("libHSPeeler", {
-    "start": [C_string, [C_string]]
-});
 const s3 = new S3File("build-config");
 
 export const specifications = spec.describe({
@@ -23,7 +18,7 @@ export const specifications = spec.describe({
             await s3.download(s3path, filepath);
             logger.debug(() => `Loading video: ${filepath}`);
 
-            require('child_process').spawn('./haskell/Peeler/peeler', [filepath], {stdio: 'inherit'});
+            require('child_process').spawn('./haskell/peeler', [filepath], {stdio: 'inherit'});
         }
     }
 });
