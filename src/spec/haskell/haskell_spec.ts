@@ -18,7 +18,18 @@ export const specifications = spec.describe({
             await s3.download(s3path, filepath);
             logger.debug(() => `Loading video: ${filepath}`);
 
-            require('child_process').spawn('./haskell/peeler', [filepath], {stdio: [process.stdin, process.stdout, process.stdout]});
+            await new Promise((resolve, reject) => {
+                const exe = "./haskell/peeler";
+                require('child_process').execFile(exe, [filepath], (error, stdout, stderr) => {
+                    logger.info(() => `${exe}: STDOUT: ${stdout}`);
+                    logger.warn(() => `${exe}: STDERR: ${stderr}`);
+                    if (_.isNil(error)) {
+                      resolve();
+                    } else {
+                      reject(error);
+                    }
+                });
+            });
         }
     }
 });
