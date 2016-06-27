@@ -18,7 +18,7 @@ export const specifications = spec.describe({
             await s3.download(s3path, filepath);
             logger.debug(() => `Loading video: ${filepath}`);
 
-            require('child_process').spawn('./haskell/peeler', [filepath], {stdio: 'inherit'});
+            require('child_process').spawn('./haskell/peeler', [filepath], {stdio: [process.stdin, process.stdout, process.stdout]});
         }
     }
 });
