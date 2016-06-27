@@ -1,4 +1,4 @@
-FROM fathens/docker-lambda-peeler
+FROM fathens/docker-lambda-peeler:ipp
 
 RUN set -x \
  && yum update -y \
