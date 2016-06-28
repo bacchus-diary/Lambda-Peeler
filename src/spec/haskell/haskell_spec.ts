@@ -31,8 +31,6 @@ export const specifications = spec.describe({
                     });
                 });
             }
-
-            await exec("./checker.sh", []);
             await exec("./haskell/peeler", [filepath]);
         }
     }
