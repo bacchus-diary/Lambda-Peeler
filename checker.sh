@@ -10,4 +10,4 @@ ls -la haskell
 
 ldd haskell/peeler
 
-unzip abc
+unzip abc || echo 'OK'
