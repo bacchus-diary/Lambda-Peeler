@@ -8,8 +8,6 @@
 #include "opencv2/xfeatures2d.hpp"
 #include "opencv2/videoio.hpp"
 
-#include "Facade_stub.h"
-
 using namespace cv;
 using namespace std;
 
@@ -32,9 +30,12 @@ extern "C" {
         while (i < 10 && capture.read(frame)) {
             detector->detectAndCompute(frame, noArray(), keypoints, desc);
             printf("Detected points: %d\n", keypoints.size());
-            compareKeypoints(i);
             i++;
         }
         capture.release();
     }
+}
+
+int main(int argc, char *argv[]) {
+    loadVideo(argv[1]);
 }
