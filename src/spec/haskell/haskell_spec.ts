@@ -26,7 +26,6 @@ export const specifications = spec.describe({
             logger.debug(() => `Result of start: ${JSON.stringify(result)}`);
 
             spec.expect(result).must_be(filepath);
-            require('child_process').spawn('./haskell/Peeler/peeler', [filepath], {stdio: 'inherit'});
         }
     }
 });
