@@ -11,7 +11,7 @@
 using namespace cv;
 using namespace std;
 
-Ptr<cv::xfeatures2d::SIFT> detector = cv::xfeatures2d::SIFT::create(400);
+Ptr<BRISK> detector = BRISK::create();
 BFMatcher matcher(detector->defaultNorm());
 
 extern "C" {
