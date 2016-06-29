@@ -14,8 +14,8 @@ using namespace std;
 extern "C" {
     void loadVideo(char *videoFile) {
         initModule_nonfree();
-        Ptr<FeatureDetector> detector = FeatureDetector::create("SURF");
-        Ptr<DescriptorExtractor> extractor = DescriptorExtractor::create("SURF");
+        Ptr<FeatureDetector> detector = FeatureDetector::create("STAR");
+        Ptr<DescriptorExtractor> extractor = DescriptorExtractor::create("BRIEF");
 
         VideoCapture capture(videoFile);
         if (!capture.isOpened()) {
