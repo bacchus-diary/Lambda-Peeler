@@ -11,7 +11,7 @@
 using namespace cv;
 using namespace std;
 
-Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create(400);
+Ptr<cv::xfeatures2d::SIFT> detector = cv::xfeatures2d::SIFT::create(400);
 BFMatcher matcher(detector->defaultNorm());
 
 extern "C" {
