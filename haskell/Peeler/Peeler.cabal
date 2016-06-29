@@ -26,7 +26,7 @@ Executable peeler
   ghc-shared-options:  -O2 -optc-O3 -optc-ffast-math -fexcess-precision
   include-dirs:        /var/task/include
   extra-lib-dirs:      /var/task/lib
-  extra-libraries:     stdc++, levmar, opencv_aruco, opencv_bgsegm, opencv_bioinspired, opencv_calib3d, opencv_ccalib, opencv_core, opencv_datasets, opencv_dnn, opencv_dpm, opencv_face, opencv_features2d, opencv_flann, opencv_fuzzy, opencv_highgui, opencv_imgcodecs, opencv_imgproc, opencv_line_descriptor, opencv_ml, opencv_objdetect, opencv_optflow, opencv_photo, opencv_plot, opencv_reg, opencv_rgbd, opencv_saliency, opencv_shape, opencv_stereo, opencv_stitching, opencv_structured_light, opencv_superres, opencv_surface_matching, opencv_text, opencv_tracking, opencv_videoio, opencv_video, opencv_videostab, opencv_contrib_world, opencv_ximgproc, opencv_xobjdetect, opencv_xphoto
+  extra-libraries:     stdc++, levmar, opencv_legacy, opencv_photo, opencv_stitching, opencv_calib3d, opencv_ocl, opencv_highgui, opencv_video, opencv_videostab, opencv_superres, opencv_ml, opencv_gpu, opencv_nonfree, opencv_core, opencv_contrib, opencv_features2d, opencv_imgproc, opencv_objdetect, opencv_flann
 
 test-suite AllSpecs
   type:                exitcode-stdio-1.0

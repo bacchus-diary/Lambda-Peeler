@@ -5,14 +5,13 @@
 #include "opencv2/core.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/features2d.hpp"
-#include "opencv2/xfeatures2d.hpp"
-#include "opencv2/videoio.hpp"
+#include "opencv2/video.hpp"
+#include "opencv2/nonfree/nonfree.hpp"
 
 using namespace cv;
 using namespace std;
 
-Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create(400);
-BFMatcher matcher(detector->defaultNorm());
+Ptr<SURF> detector = new SURF(400);
 
 extern "C" {
     void loadVideo(char *videoFile) {
@@ -28,7 +27,9 @@ extern "C" {
 
         int i = 0;
         while (i < 10 && capture.read(frame)) {
-            printf("Read frame[%d]\n", i);
+            cerr << "Detecting points at frame[" << i << "]" << endl;
+            detector->operator()(frame, noArray(), keypoints, desc);
+            cerr << "Detected points: " << keypoints.size() << endl;
             i++;
         }
         capture.release();
