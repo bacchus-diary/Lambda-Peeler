@@ -5,18 +5,17 @@
 #include "opencv2/core.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/features2d.hpp"
-#include "opencv2/video.hpp"
-#include "opencv2/nonfree/nonfree.hpp"
+#include "opencv2/xfeatures2d.hpp"
+#include "opencv2/videoio.hpp"
 
 using namespace cv;
 using namespace std;
 
+Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create(400);
+BFMatcher matcher(detector->defaultNorm());
+
 extern "C" {
     void loadVideo(char *videoFile) {
-        initModule_nonfree();
-        Ptr<FeatureDetector> detector = FeatureDetector::create("STAR");
-        Ptr<DescriptorExtractor> extractor = DescriptorExtractor::create("BRIEF");
-
         VideoCapture capture(videoFile);
         if (!capture.isOpened()) {
             cerr << "Unable to open video file: " << videoFile << endl;
@@ -29,10 +28,9 @@ extern "C" {
 
         int i = 0;
         while (i < 10 && capture.read(frame)) {
-            cerr << "Detecting points at frame[" << i << "]" << endl;
-            detector->detect(frame, keypoints);
-            extractor->compute(frame, keypoints, desc);
-            cerr << "Detected points: " << keypoints.size() << endl;
+            printf("Detecting points at frame[%d]\n", i);
+            detector->detectAndCompute(frame, noArray(), keypoints, desc);
+            printf("Detected points: %d\n", keypoints.size());
             i++;
         }
         capture.release();
