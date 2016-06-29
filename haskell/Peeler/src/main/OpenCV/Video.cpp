@@ -28,9 +28,7 @@ extern "C" {
 
         int i = 0;
         while (i < 10 && capture.read(frame)) {
-            printf("Detecting points at frame[%d]\n", i);
-            detector->detectAndCompute(frame, noArray(), keypoints, desc);
-            printf("Detected points: %d\n", keypoints.size());
+            printf("Read frame[%d]\n", i);
             i++;
         }
         capture.release();
