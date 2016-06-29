@@ -69,15 +69,11 @@ gulp.task('haskell', shell.task([
     "haskell/install.sh"
 ]));
 
-gulp.task('only_c', shell.task([
-    "g++ -L/var/task/lib -I/var/task/include haskell/Peeler/src/main/OpenCV/only_c.cpp -llevmar -lopencv_legacy -lopencv_photo -lopencv_stitching -lopencv_calib3d -lopencv_ocl -lopencv_highgui -lopencv_video -lopencv_videostab -lopencv_superres -lopencv_ml -lopencv_gpu -lopencv_nonfree -lopencv_core -lopencv_contrib -lopencv_features2d -lopencv_imgproc -lopencv_objdetect -lopencv_flann -o haskell/Peeler/only_c"
-]));
-
 gulp.task('test-only', [], (cb) => {
     require('./main_bundle').handler('TEST', null, cb);
 });
 
-gulp.task('test', ['only_c', 'build', 'haskell'], (cb) => {
+gulp.task('test', ['build', 'haskell'], (cb) => {
     runSeq('test-only', cb);
 });
 
