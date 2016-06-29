@@ -6,16 +6,13 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/features2d.hpp"
 #include "opencv2/video.hpp"
-#include "opencv2/nonfree/nonfree.hpp"
 
 using namespace cv;
 using namespace std;
 
 extern "C" {
     void loadVideo(char *videoFile) {
-        initModule_nonfree();
-
-        Ptr<SURF> detector = new SURF(400);
+        Ptr<FeatureDetector> detector = FeatureDetector::create("STAR");
 
         VideoCapture capture(videoFile);
         if (!capture.isOpened()) {
@@ -30,7 +27,7 @@ extern "C" {
         int i = 0;
         while (i < 10 && capture.read(frame)) {
             cerr << "Detecting points at frame[" << i << "]" << endl;
-            detector->operator()(frame, noArray(), keypoints, desc);
+            detector->detect(frame, keypoints, desc);
             cerr << "Detected points: " << keypoints.size() << endl;
             i++;
         }
