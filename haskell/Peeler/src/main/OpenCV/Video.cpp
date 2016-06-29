@@ -11,10 +11,12 @@
 using namespace cv;
 using namespace std;
 
-Ptr<SURF> detector = new SURF(400);
-
 extern "C" {
     void loadVideo(char *videoFile) {
+        initModule_nonfree();
+
+        Ptr<SURF> detector = new SURF(400);
+
         VideoCapture capture(videoFile);
         if (!capture.isOpened()) {
             cerr << "Unable to open video file: " << videoFile << endl;
