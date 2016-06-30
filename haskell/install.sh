@@ -2,7 +2,7 @@
 
 target_dir=$1
 
-EXTRA_LIB=libHSrts_thr-ghc$(stack exec -- ghc --numeric-version).so
+EXTRA_LIB=libHSrts-ghc$(stack exec -- ghc --numeric-version).so
 
 find $(dirname $0)/ -type f -name '*.so' | while read file
 do
