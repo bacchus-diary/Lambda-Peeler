@@ -1,0 +1,2 @@
+
+void loadVideo(char *videoFile);
