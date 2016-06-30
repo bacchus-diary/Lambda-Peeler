@@ -21,7 +21,7 @@ library
                      , vector
                      , containers
                      , array
-  ghc-options:         -pgmlg++
+  ghc-options:         -pgmlg++ -threaded
   hs-source-dirs:      src/main
   c-sources:           src/main/hsbracket.c
                      , src/main/OpenCV/Video.cpp
