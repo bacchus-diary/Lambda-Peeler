@@ -16,6 +16,8 @@ BFMatcher matcher(detector->defaultNorm());
 
 extern "C" {
     void loadVideo(char *videoFile) {
+        printf("Capturing video: %s", videoFile);
+
         VideoCapture capture(videoFile);
         if (!capture.isOpened()) {
             cerr << "Unable to open video file: " << videoFile << endl;

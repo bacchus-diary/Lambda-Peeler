@@ -8,6 +8,7 @@ foreign import ccall "loadVideo" loadVideo :: CString -> IO ()
 foreign export ccall start :: CString -> IO CString
 start :: CString -> IO CString
 start moviePath = do
+    print "Loading video..."
     loadVideo moviePath
     return moviePath
 
