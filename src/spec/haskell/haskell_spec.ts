@@ -8,21 +8,29 @@ const logger = new Logger("HaskellSpec");
 
 const s3 = new S3File("build-config");
 
+const proc = require('child_process');
+function exec(cmd) {
+    return new Promise((resolve, reject) => {
+        logger.debug(() => `Executing: ${cmd}`);
+        proc.exec(cmd, (error, stdout, stderr) => {
+            logger.info(() => `${cmd}: STDOUT: ${stdout}`);
+            logger.warn(() => `${cmd}: STDERR: ${stderr}`);
+            if (!_.isNil(error)) {
+                logger.warn(() => `${cmd}: ERROR: ${error}`);
+            }
+            resolve();
+        });
+    });
+}
+
 export const specifications = spec.describe({
     "Haskell": {
         "start": async () => {
             const s3path = "bacchus-diary/Lambda-Peeler/test_data/pickled_cucumbers.mp4";
             const filepath = path.resolve(`/tmp/${path.basename(s3path)}`);
             await s3.download(s3path, filepath);
-            logger.debug(() => `Loading video: ${filepath}`);
 
-            await new Promise((resolve, reject) => {
-                require("child_process").spawn("./haskell/bin/peeler", [filepath], {stdio: "inherit"}).on("close", (code) => {
-                    logger.debug(() => `Result of haskell: ${code}`);
-                    spec.expect(code).must_be(0);
-                    resolve();
-                });
-            });
+            await exec(`./haskell/bin/peeler ${filepath}`);
         }
     }
 });
