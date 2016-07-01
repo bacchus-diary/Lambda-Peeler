@@ -3,7 +3,7 @@
 cd $(dirname $0)
 
 lib_dir=$1
-bin_dir=$(dirname $0)/bin
+bin_dir=bin
 
 stack='stack --allow-different-user'
 
