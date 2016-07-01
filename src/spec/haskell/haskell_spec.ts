@@ -16,8 +16,11 @@ export const specifications = spec.describe({
             await s3.download(s3path, filepath);
             logger.debug(() => `Loading video: ${filepath}`);
 
-            require("child_process").spawn("./haskell/bin/peeler", [filepath], {stdio: "inherit"}).on("close", (code) => {
-                spec.expect(code).must_be(0);
+            await new Promise((resolve, reject) => {
+                require("child_process").spawn("./haskell/bin/peeler", [filepath], {stdio: "inherit"}).on("close", (code) => {
+                    spec.expect(code).must_be(0);
+                    resolve();
+                });
             });
         }
     }
