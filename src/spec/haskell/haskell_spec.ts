@@ -3,16 +3,9 @@ import {S3File} from "../../services/aws/s3file";
 import {Logger} from "../../util/logging";
 
 const path = require("path");
-const ffi = require("ffi");
-const ref = require("ref");
 
 const logger = new Logger("HaskellSpec");
 
-const C_string = ref.types.CString;
-
-const peeler = ffi.Library("libHSPeeler", {
-    "start": [C_string, [C_string]]
-});
 const s3 = new S3File("build-config");
 
 export const specifications = spec.describe({
@@ -22,10 +15,10 @@ export const specifications = spec.describe({
             const filepath = path.resolve(`/tmp/${path.basename(s3path)}`);
             await s3.download(s3path, filepath);
             logger.debug(() => `Loading video: ${filepath}`);
-            const result = peeler.start(filepath);
-            logger.debug(() => `Result of start: ${JSON.stringify(result)}`);
 
-            spec.expect(result).must_be(filepath);
+            require("child_process").spawn("./haskell/bin/peeler", [filepath], {stdio: "inherit"}).on("close", (code) => {
+                spec.expect(code).must_be(0);
+            });
         }
     }
 });

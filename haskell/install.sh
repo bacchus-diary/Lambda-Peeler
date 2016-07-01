@@ -1,20 +1,16 @@
 #!/bin/bash
 
-target_dir=$1
+lib_dir=$1
+bin_dir=$(dirname $0)/bin
 
-EXTRA_LIB=libHSrts_thr-ghc$(stack exec -- ghc --numeric-version).so
-
-find $(dirname $0)/ -type f -name '*.so' | while read file
+find $(dirname $0)/*/ -executable -type f ! -name '*.so' ! -name '*Specs' | while read file
 do
-    name=$(basename $file)
-    target=$target_dir/${name%%-*}.so
+    target=$bin_dir/$(basename $file)
+    mkdir -vp $(dirname $target)
     cp -vu $file $target
-
-    echo "Adding '$EXTRA_LIB' to $target"
-    patchelf --add-needed $EXTRA_LIB $target
 
     ldd $target | awk '{print $(NF-1)}' | grep /.stack | while read lib
     do
-        cp -vu $lib $target_dir
+        cp -vu $lib $lib_dir
     done
 done
