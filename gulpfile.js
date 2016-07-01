@@ -65,7 +65,7 @@ gulp.task('inject-tests', (cb) => {
 });
 
 gulp.task('haskell', shell.task([
-    "cd haskell && stack --install-ghc --allow-different-user test",
+    "cd haskell && stack --install-ghc --allow-different-user install",
     "haskell/install.sh /var/task/lib"
 ]));
 
