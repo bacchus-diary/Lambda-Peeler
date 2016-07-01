@@ -8,8 +8,6 @@
 #include "opencv2/xfeatures2d.hpp"
 #include "opencv2/videoio.hpp"
 
-#include "CompareKeys_stub.h"
-
 using namespace cv;
 using namespace std;
 
@@ -35,7 +33,6 @@ extern "C" {
             printf("Detecting points at frame[%d]\n", i);
             detector->detectAndCompute(frame, noArray(), keypoints, desc);
             printf("Detected points: %d\n", keypoints.size());
-            hsCompareKeypoints(i);
             i++;
         }
         capture.release();
