@@ -3,18 +3,23 @@
 cd $(dirname $0)
 
 lib_dir=$1
-bin_dir=bin
 
 stack='stack --allow-different-user'
 
 $stack --install-ghc test
 $stack install
 
-find $($stack path --local-bin) -executable -type f | while read file
+EXTRA_LIB=libHSrts_thr-ghc$($stack exec -- ghc --numeric-version).so
+
+find $($stack path --local-install-root)/lib -type f -name '*.so' | while read file
 do
-    target=$bin_dir/$(basename $file)
-    mkdir -vp $(dirname $target)
+    set +x
+    name=$(basename $file)
+    target=$lib_dir/${name%%-*}.so
     cp -vu $file $target
+
+    echo "Adding '$EXTRA_LIB' to $target"
+    patchelf --add-needed $EXTRA_LIB $target
 
     ldd $target | awk '{print $(NF-1)}' | grep /.stack | while read lib
     do

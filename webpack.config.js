@@ -13,6 +13,8 @@ module.exports = {
         pathinfo: false // show module paths in the bundle, handy for debugging
     },
     externals: [
+        /^ffi$/,
+        /^ref$/,
         /^aws\-sdk$/
     ],
     target: 'node',
