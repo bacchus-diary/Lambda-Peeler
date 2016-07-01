@@ -1,9 +1,16 @@
-#!/bin/bash
+#!/bin/bash -eux
+
+cd $(dirname $0)
 
 lib_dir=$1
 bin_dir=$(dirname $0)/bin
 
-find $(dirname $0)/.stack-work/ -executable -type f ! -name '*.so' ! -name '*Specs' | while read file
+stack='stack --allow-different-user'
+
+$stack --install-ghc test
+$stack install
+
+find $($stack path --local-bin) -executable -type f | while read file
 do
     target=$bin_dir/$(basename $file)
     mkdir -vp $(dirname $target)
