@@ -18,6 +18,7 @@ export const specifications = spec.describe({
 
             await new Promise((resolve, reject) => {
                 require("child_process").spawn("./haskell/bin/peeler", [filepath], {stdio: "inherit"}).on("close", (code) => {
+                    logger.debug(() => `Result of haskell: ${code}`);
                     spec.expect(code).must_be(0);
                     resolve();
                 });
