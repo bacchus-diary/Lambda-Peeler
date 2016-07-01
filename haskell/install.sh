@@ -5,12 +5,12 @@ cd $(dirname $0)
 lib_dir=$1
 bin_dir=bin
 
-stack='stack --allow-different-user'
+alias stack='stack --allow-different-user'
 
-$stack --install-ghc test
-$stack install
+stack --install-ghc test
+stack install
 
-find $($stack path --local-bin) -executable -type f | while read file
+find $(stack path --local-bin) -executable -type f | while read file
 do
     target=$bin_dir/$(basename $file)
     mkdir -vp $(dirname $target)
