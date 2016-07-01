@@ -13,7 +13,7 @@
 using namespace cv;
 using namespace std;
 
-Ptr<BRISK> detector = BRISK::create();
+Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create(400);
 BFMatcher matcher(detector->defaultNorm());
 
 extern "C" {
