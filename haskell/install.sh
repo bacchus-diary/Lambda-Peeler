@@ -1,13 +1,21 @@
-#!/bin/bash
+#!/bin/bash -eux
 
-target_dir=$1
+cd $(dirname $0)
 
-EXTRA_LIB=libHSrts_thr-ghc$(stack exec -- ghc --numeric-version).so
+lib_dir=$1
 
-find $(dirname $0)/ -type f -name '*.so' | while read file
+stack='stack --allow-different-user'
+
+$stack --install-ghc test
+$stack install
+
+EXTRA_LIB=libHSrts_thr-ghc$($stack exec -- ghc --numeric-version).so
+
+find $($stack path --local-install-root)/lib -type f -name '*.so' | while read file
 do
+    set +x
     name=$(basename $file)
-    target=$target_dir/${name%%-*}.so
+    target=$lib_dir/${name%%-*}.so
     cp -vu $file $target
 
     echo "Adding '$EXTRA_LIB' to $target"
@@ -15,6 +23,6 @@ do
 
     ldd $target | awk '{print $(NF-1)}' | grep /.stack | while read lib
     do
-        cp -vu $lib $target_dir
+        cp -vu $lib $lib_dir
     done
 done

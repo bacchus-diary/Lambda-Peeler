@@ -10,7 +10,14 @@ branches:
 env:
   global:
     - AWS_LAMBDA_ALIAS_NAME=$(if [ "$TRAVIS_BRANCH" == 'master' ]; then echo Production; else echo Beta; fi)
-    - DOCKER_IMAGE=fathens/docker-lambda-peeler:haskell
+    - DOCKER_IMAGE=fathens/docker-lambda-peeler
+
+before_install:
+  - curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+  - sudo apt-get install git-lfs
+  - /usr/bin/git-lfs version
+  - /usr/bin/git-lfs install
+  - /usr/bin/git-lfs pull
 
 install:
   - sudo easy_install pip && sudo pip install awscli

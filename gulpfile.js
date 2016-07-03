@@ -65,7 +65,6 @@ gulp.task('inject-tests', (cb) => {
 });
 
 gulp.task('haskell', shell.task([
-    "stack --install-ghc --allow-different-user test",
     "haskell/install.sh /var/task/lib"
 ]));
 
@@ -81,7 +80,7 @@ gulp.task('pack', ['test'], () => {
     const exclude = /aws\-sdk/;
     const externals = require('./webpack.config.js').externals;
 
-    const sources = ['./*_bundle.js'];
+    const sources = ['./*_bundle.js', './haskell/bin/**'];
     fs.readdirSync('./node_modules')
     .filter((x) => !exclude.test(x))
     .filter((x) => externals.some((y) => y.test(x)))
