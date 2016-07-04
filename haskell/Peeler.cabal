@@ -25,6 +25,8 @@ library
   ghc-options:         -pgmlg++
   hs-source-dirs:      src/lib
   c-sources:           src/c++/hsbracket.c
+                     , src/c++/filesystem.cpp
+                     , src/c++/image_utils.cpp
                      , src/c++/Video.cpp
   ghc-shared-options:  -O2 -optc-O3 -optc-ffast-math -fexcess-precision
   include-dirs:        /var/task/include
