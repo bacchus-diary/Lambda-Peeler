@@ -23,8 +23,7 @@ struct Detected {
 
 struct MatchPoints {
     vector<DMatch> matches;
-    vector<Point2f> pre;
-    vector<Point2f> post;
+    vector<DMatch> inliers;
 };
 
 Ptr<Feature2D> feature = AKAZE::create();
@@ -32,7 +31,27 @@ BFMatcher matcher(feature->defaultNorm(), true);
 
 MatchPoints matchPoints(Detected previous, Detected current, float distanceRate = 0.6f) {
     MatchPoints result;
+
     matcher.match(previous.desc, current.desc, result.matches);
+
+    vector<Point2f> points1, points2;
+    for (size_t i = 0; i < result.matches.size(); i++) {
+        DMatch m = result.matches[i];
+        points1.push_back(previous.keypoints[m.queryIdx].pt);
+        points2.push_back(current.keypoints[m.trainIdx].pt);
+    }
+
+    Mat masks, hm;
+    if (result.matches.size() > 0) {
+        hm = findHomography(points1, points2, masks, RANSAC, 3.0f);
+    }
+    for (size_t i = 0; i < masks.rows; i++) {
+        uchar *inlier = masks.ptr<uchar>(i);
+        if (inlier[0] == 1) {
+            result.inliers.push_back(result.matches[i]);
+        }
+    }
+
     return result;
 }
 
@@ -43,7 +62,7 @@ void writeMatches(Detected previous, Detected current, MatchPoints points, strin
     }
     mkParents((char *)filename.c_str(), 0775);
     Mat out;
-    drawMatches(previous.frame, previous.keypoints, current.frame, current.keypoints, points.matches, out);
+    drawMatches(previous.frame, previous.keypoints, current.frame, current.keypoints, points.inliers, out);
     cout << "Writing img to " << filename << endl;
     imwrite(filename, out);
     cout << "Completed to write img to " << filename << endl;
