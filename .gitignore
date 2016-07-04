@@ -7,3 +7,4 @@ typings/
 *.zip
 /src/spec/_specs.json
 bin/
+/haskell/resources/out/
