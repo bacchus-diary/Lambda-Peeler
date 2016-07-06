@@ -9,8 +9,8 @@
 #include "opencv2/features2d.hpp"
 #include "opencv2/videoio.hpp"
 
-#include "filesystem.hpp"
-#include "image_utils.hpp"
+#include "util/filesystem.hpp"
+#include "util/images.hpp"
 #include "CompareKeys_stub.h"
 
 using namespace cv;
