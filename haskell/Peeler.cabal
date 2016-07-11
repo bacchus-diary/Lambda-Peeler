@@ -28,6 +28,7 @@ library
   c-sources:           src/c++/hsbracket.c
                      , src/c++/util/filesystem.cpp
                      , src/c++/util/images.cpp
+                     , src/c++/spot/center_slit.cpp
                      , src/c++/Video.cpp
   ghc-shared-options:  -O2 -optc-O3 -optc-ffast-math -fexcess-precision
   include-dirs:        /var/task/include
