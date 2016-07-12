@@ -12,17 +12,21 @@ namespace geometry {
     Line::Line(cv::Point2f p, cv::Vec2f d): Line(p, d[1] / d[0]) {}
     Line::Line(cv::Point2f p, float slope_) {
         float x = 0, y = 0;
-        if (-1 <= slope_ && slope_ <= 1) {
-            y = slope_ * (x - p.x) + p.y;
-        } else {
+        if (1 < std::abs(slope_)) {
             x = (y - p.y) / slope_ + p.x;
+        } else {
+            y = slope_ * (x - p.x) + p.y;
         }
         intercept = cv::Point2f(x, y);
         slope = slope_;
     }
 
     cv::Vec2f Line::vec() {
-        return cv::Vec2f(1, slope);
+        if (1 < std::abs(slope)) {
+            return cv::Vec2f(1/slope, 1);
+        } else {
+            return cv::Vec2f(1, slope);
+        }
     }
 
     cv::Vec2f rotateVec(const float angle, const cv::Vec2f src) {
