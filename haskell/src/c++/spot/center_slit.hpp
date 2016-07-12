@@ -10,7 +10,7 @@ class CenterSlit {
 private:
     cv::Mat marged;
     Detected previous;
-    cv::Point2f moved;
+    cv::Vec2f moved;
 public:
     CenterSlit();
     void addFrame(cv::Mat frame);

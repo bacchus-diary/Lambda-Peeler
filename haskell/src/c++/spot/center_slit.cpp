@@ -4,6 +4,7 @@
 #include "opencv2/highgui.hpp"
 #include "opencv2/opencv.hpp"
 
+#include "../util/geometry.hpp"
 #include "center_slit.hpp"
 
 cv::Ptr<cv::Feature2D> feature = cv::AKAZE::create();
@@ -45,7 +46,7 @@ std::pair<std::vector<MatchPoint>, Detected> matchPoints(Detected previous, Dete
     return std::make_pair(result, reduced);
 }
 
-cv::Point2f direction(std::vector<MatchPoint> points) {
+cv::Vec2f findDirection(std::vector<MatchPoint> points) {
     float x = 0;
     float y = 0;
     for (auto p: points) {
@@ -53,12 +54,18 @@ cv::Point2f direction(std::vector<MatchPoint> points) {
         x += v.x;
         y += v.y;
     }
-    return cv::Point2f(x / points.size(), y / points.size());
+    return cv::Vec2f(x / points.size(), y / points.size());
+}
+
+Line findCenter(cv::Mat frame, std::vector<MatchPoint> points, cv::Vec2f horizon) {
+    Line result;
+    result.direction = rotateVec(90, horizon);
+    return result;
 }
 
 CenterSlit::CenterSlit() {
     std::cout << "Initializing empty CenterSlit..." << std::endl;
-    moved = cv::Point2f(0, 0);
+    moved = cv::Vec2f(0, 0);
 }
 
 cv::Mat CenterSlit::getMarged() {
@@ -75,9 +82,13 @@ void CenterSlit::addFrame(cv::Mat frame) {
         std::vector<MatchPoint> points;
         std:tie(points, current) = matchPoints(previous, current);
         std::cout << "Matched Points: " << points.size() << std::endl;
-        auto d = direction(points);
+
+        const auto d = findDirection(points);
         moved += d;
         std::cout << "Direction of frame: " << d << " (total: " << moved << ")" << std::endl;
+
+        const auto c = findCenter(frame, points, d);
+        std::cout << "Center: (" << c << ")" << std::endl;
     }
     previous = current;
 }

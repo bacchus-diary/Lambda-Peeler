@@ -27,6 +27,7 @@ library
   hs-source-dirs:      src/lib
   c-sources:           src/c++/hsbracket.c
                      , src/c++/util/filesystem.cpp
+                     , src/c++/util/geometry.cpp
                      , src/c++/util/images.cpp
                      , src/c++/spot/center_slit.cpp
                      , src/c++/Video.cpp
