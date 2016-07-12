@@ -5,12 +5,29 @@
 #include "geometry.hpp"
 
 namespace geometry {
-    Line::Line(): Line(cv::Point2f(0, 0), 0) {}
-    Line::Line(float slope_): Line(cv::Point2f(0, 0), slope_) {}
-    Line::Line(cv::Vec2f d): Line(cv::Point2f(0, 0), d) {}
-    Line::Line(float intercept_y, float slope_): Line(cv::Point2f(0, intercept_y), slope_) {}
-    Line::Line(cv::Point2f p, cv::Vec2f d): Line(p, d[1] / d[0]) {}
+    Line::Line() {
+        set(0.0f);
+    }
+    Line::Line(float slope_) {
+        set(slope_);
+    }
+    Line::Line(cv::Vec2f d) {
+        set(d);
+    }
+    Line::Line(float intercept_y, float slope_) {
+        set(slope_, cv::Point2f(0, intercept_y));
+    }
+    Line::Line(cv::Point2f p, cv::Vec2f d) {
+        set(d, p);
+    }
     Line::Line(cv::Point2f p, float slope_) {
+        set(slope_, p);
+    }
+
+    void Line::set(cv::Vec2f d, cv::Point2f p) {
+        set(d[1] / d[0], p);
+    }
+    void Line::set(float slope_, cv::Point2f p) {
         float x = 0, y = 0;
         if (1 < std::abs(slope_)) {
             x = (y - p.y) / slope_ + p.x;
@@ -21,7 +38,23 @@ namespace geometry {
         slope = slope_;
     }
 
-    cv::Vec2f Line::vec() {
+    void Line::setIntercept(cv::Point2f p) {
+        set(slope, p);
+    }
+    void Line::setVec(cv::Vec2f v) {
+        set(v, intercept);
+    }
+    void Line::setSlope(float s) {
+        set(s, intercept);
+    }
+
+    float Line::getSlope() {
+        return slope;
+    }
+    cv::Point2f Line::getIntercept() {
+        return cv::Point2f(intercept);
+    }
+    cv::Vec2f Line::getVec() {
         if (1 < std::abs(slope)) {
             return cv::Vec2f(1/slope, 1);
         } else {
