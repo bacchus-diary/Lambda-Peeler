@@ -57,9 +57,9 @@ cv::Vec2f findDirection(std::vector<MatchPoint> points) {
     return cv::Vec2f(x / points.size(), y / points.size());
 }
 
-Line findCenter(cv::Mat frame, std::vector<MatchPoint> points, cv::Vec2f horizon) {
-    Line result;
-    result.direction = rotateVec(90, horizon);
+geometry::Line findCenter(const cv::Mat frame, const std::vector<MatchPoint> points, const cv::Vec2f horizon) {
+    geometry::Line result;
+    result.direction = geometry::rotateVec(90, horizon);
     return result;
 }
 
@@ -87,7 +87,7 @@ void CenterSlit::addFrame(cv::Mat frame) {
         moved += d;
         std::cout << "Direction of frame: " << d << " (total: " << moved << ")" << std::endl;
 
-        const auto c = findCenter(frame, points, d);
+        const auto c = findCenter(frame, points, moved);
         std::cout << "Center: (" << c << ")" << std::endl;
     }
     previous = current;
