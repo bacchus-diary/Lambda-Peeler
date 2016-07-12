@@ -1,9 +1,20 @@
 namespace geometry {
-    struct Line {
-        cv::Point2f point;
-        cv::Vec2f direction;
+    class Line {
+    public:
+        Line();
+        Line(cv::Vec2f vec);
+        Line(float slope);
+        Line(float intercept_y, float slope);
+        Line(cv::Point2f p, cv::Vec2f d);
+        Line(cv::Point2f p, float slope);
+
+        cv::Point2f intercept;
+        float slope;
+
+        cv::Vec2f vec();
+
         friend std::ostream& operator<< (std::ostream &out, const Line &line) {
-            return out << "point:" << line.point << ", direction:" << line.direction;
+            return out << "intercept:" << line.intercept << ", slope:" << line.slope;
         }
     };
 

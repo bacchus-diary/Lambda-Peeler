@@ -58,8 +58,7 @@ cv::Vec2f findDirection(std::vector<MatchPoint> points) {
 }
 
 geometry::Line findCenter(const cv::Mat frame, const std::vector<MatchPoint> points, const cv::Vec2f horizon) {
-    geometry::Line result;
-    result.direction = geometry::rotateVec(90, horizon);
+    geometry::Line result = geometry::rotateVec(90, horizon);
     return result;
 }
 
