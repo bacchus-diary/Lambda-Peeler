@@ -23,16 +23,19 @@ namespace geometry {
         cv::Vec2f getVec();
 
         friend std::ostream& operator<< (std::ostream &out, const Line &line) {
-            if (std::isinf(line.slope)) {
-                return out << "x=" << line.intercept.x;
+            const auto adda = [&out](const float a) {
+                if (a != 0) {
+                    out << (a < 0 ? "-" : "+") << "(" <<  std::abs(a) << ")";
+                }
+            };
+            if (1 < std::abs(line.slope)) {
+                out << "x=(" << (1 / line.slope) << ")y";
+                adda(line.intercept.x - line.intercept.y / line.slope);
             } else {
                 out << "y=(" << line.slope << ")x";
-                if (line.intercept.y != 0) {
-                    out << (line.intercept.y < 0 ? "-" : "+");
-                    out << "(" <<  std::abs(line.intercept.y) << ")";
-                }
-                return out;
+                adda(line.intercept.y - line.intercept.x * line.slope);
             }
+            return out;
         }
     };
 
