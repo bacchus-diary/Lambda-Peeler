@@ -38,7 +38,7 @@ namespace geometry {
         slope = slope_;
     }
 
-    void Line::setIntercept(cv::Point2f p) {
+    void Line::setPoint(cv::Point2f p) {
         set(slope, p);
     }
     void Line::setVec(cv::Vec2f v) {

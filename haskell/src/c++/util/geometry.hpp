@@ -14,7 +14,7 @@ namespace geometry {
         Line(cv::Point2f p, cv::Vec2f d);
         Line(cv::Point2f p, float slope);
 
-        void setIntercept(cv::Point2f p);
+        void setPoint(cv::Point2f p);
         void setVec(cv::Vec2f v);
         void setSlope(float s);
 
