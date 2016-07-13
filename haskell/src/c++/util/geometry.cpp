@@ -66,7 +66,7 @@ namespace geometry {
         const auto g = angle * M_PI / 180;
         const float c = std::cos(g);
         const float s = std::sin(g);
-        return normVec(cv::Matx22f(c, -s, s, c) * src);
+        return cv::Matx22f(c, -s, s, c) * src;
     }
 
     cv::Vec2f normVec(const cv::Vec2f src) {
