@@ -1,16 +1,10 @@
-#include <iostream>
-
-#include "opencv2/core.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/opencv.hpp"
-
-#include "../util/geometry.hpp"
 #include "center_slit.hpp"
 
 cv::Ptr<cv::Feature2D> feature = cv::AKAZE::create();
 cv::BFMatcher matcher(feature->defaultNorm(), true);
 
 struct MatchPoint {
+    MatchPoint() {}
     MatchPoint(cv::DMatch m, cv::KeyPoint a, cv::KeyPoint b) {
         match = m;
         pre = a;
@@ -46,7 +40,7 @@ std::pair<std::vector<MatchPoint>, Detected> matchPoints(Detected previous, Dete
     return std::make_pair(result, reduced);
 }
 
-cv::Vec2f findDirection(std::vector<MatchPoint> points) {
+cv::Vec2d findDirection(std::vector<MatchPoint> points) {
     float x = 0;
     float y = 0;
     for (auto p: points) {
@@ -54,19 +48,61 @@ cv::Vec2f findDirection(std::vector<MatchPoint> points) {
         x += v.x;
         y += v.y;
     }
-    return cv::Vec2f(x / points.size(), y / points.size());
+    return cv::Vec2d(x / points.size(), y / points.size());
 }
 
-geometry::Line findCenter(const cv::Mat frame, const std::vector<MatchPoint> points, const cv::Vec2f horizon) {
-    std::cout << "Finding center of frame(" << frame.cols << " x " << frame.rows << ") by direction=" << horizon << std::endl;
-    geometry::Line result = geometry::rotateVec(90, horizon);
-    result.setPoint(cv::Point2f(frame.cols / 2, frame.rows / 2));
-    return result;
+double lengthOfIntersect(geometry::Iso_rectangle_2 rect, geometry::Direction_2 direction) {
+    auto ins = CGAL::intersection(rect, geometry::Line_2(geometry::center(rect), direction));
+    if (ins) {
+        if (const geometry::Segment_2* s = boost::get<geometry::Segment_2>(&*ins)) {
+            std::cout << "Horizontal segment: " << *s << std::endl;
+            return s->squared_length();
+        } else {
+            const geometry::Point_2* p = boost::get<geometry::Point_2>(&*ins);
+            std::cerr << "No intersection line of center, but point: " << *p << std::endl;
+        }
+    } else {
+        std::cerr << "No intersection of center." << std::endl;
+    }
+    return (double)NAN;
+}
+
+geometry::Line_2 findCenter(const cv::Mat frame, const std::vector<MatchPoint> points, const geometry::Direction_2 horizon) {
+    geometry::Iso_rectangle_2 rect(0, 0, frame.cols, frame.rows);
+
+    const double width = lengthOfIntersect(rect, horizon);
+    std::cout << "Width: " << width << std::endl;
+
+    geometry::Line_2 centerV(geometry::center(rect), geometry::mkRotation(90)(horizon));
+
+    const double ep = width / 100;
+    std::cout << "Around center: " << ep << std::endl;
+    for (auto mp: points) {
+        const auto p = geometry::convert(mp.pre.pt);
+        const auto d = CGAL::squared_distance(centerV, p);
+        if (d < ep) {
+            MatchPoint nearest;
+            double n = -1;
+            for (auto o: points) {
+                const auto op = geometry::convert(o.pre.pt);
+                if (op != p) {
+                    const double od = CGAL::squared_distance(p, op);
+                    if (n < 0 || od < n) {
+                        nearest = o;
+                        n = od;
+                    }
+                }
+            }
+            std::cout << "Neiborgh of [" << p << "]: " << nearest.pre.pt << std::endl;
+        }
+    }
+
+    return centerV;
 }
 
 CenterSlit::CenterSlit() {
     std::cout << "Initializing empty CenterSlit..." << std::endl;
-    moved = cv::Vec2f(0, 0);
+    moved = cv::Vec2d(0, 0);
 }
 
 cv::Mat CenterSlit::getMarged() {
@@ -88,8 +124,8 @@ void CenterSlit::addFrame(cv::Mat frame) {
         moved += d;
         std::cout << "Direction of frame: " << d << " (total: " << moved << ")" << std::endl;
 
-        const auto c = findCenter(frame, points, moved);
-        std::cout << "Center: (" << c << ")" << std::endl;
+        auto c = findCenter(frame, points, geometry::Vector_2(1, 0).direction());
+        std::cout << "Center: " << c << std::endl;
     }
     previous = current;
 }

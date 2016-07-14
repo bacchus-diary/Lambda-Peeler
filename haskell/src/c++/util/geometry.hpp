@@ -1,44 +1,50 @@
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
+
+#include <iostream>
+
+#include <CGAL/Cartesian.h>
+#include <CGAL/Point_2.h>
+#include <CGAL/Vector_2.h>
+#include <CGAL/Direction_2.h>
+#include <CGAL/Line_2.h>
+#include <CGAL/Ray_2.h>
+#include <CGAL/Segment_2.h>
+#include <CGAL/Triangle_2.h>
+#include <CGAL/Iso_rectangle_2.h>
+#include <CGAL/Circle_2.h>
+#include <CGAL/Bbox_2.h>
+#include <CGAL/Aff_transformation_2.h>
+#include <CGAL/intersections.h>
+
+#include "opencv2/core.hpp"
+
 namespace geometry {
-    class Line {
-    private:
-        cv::Point2f intercept;
-        float slope;
-        void set(cv::Vec2f d, cv::Point2f p = cv::Point2f(0, 0));
-        void set(float slope, cv::Point2f p = cv::Point2f(0, 0));
+    typedef CGAL::Cartesian<double> K;
 
-    public:
-        Line();
-        Line(cv::Vec2f vec);
-        Line(float slope);
-        Line(float intercept_y, float slope);
-        Line(cv::Point2f p, cv::Vec2f d);
-        Line(cv::Point2f p, float slope);
+    typedef CGAL::Point_2<K> Point_2;
+    typedef CGAL::Line_2<K> Line_2;
+    typedef CGAL::Ray_2<K> Ray_2;
+    typedef CGAL::Segment_2<K> Segment_2;
+    typedef CGAL::Bbox_2 Bbox_2;
+    typedef CGAL::Iso_rectangle_2<K> Iso_rectangle_2;
+    typedef CGAL::Triangle_2<K> Triangle_2;
+    typedef CGAL::Circle_2<K> Circle_2;
+    typedef CGAL::Direction_2<K> Direction_2;
+    typedef CGAL::Vector_2<K> Vector_2;
+    typedef CGAL::Aff_transformation_2<K> Aff_transformation_2;
 
-        void setPoint(cv::Point2f p);
-        void setVec(cv::Vec2f v);
-        void setSlope(float s);
+    double toRadian(double angle);
 
-        float getSlope();
-        cv::Point2f getIntercept();
-        cv::Vec2f getVec();
+    Point_2 convert(cv::Point2d a);
+    cv::Point2d convert(Point_2 a);
 
-        friend std::ostream& operator<< (std::ostream &out, const Line &line) {
-            const auto adda = [&out](const float a) {
-                if (a != 0) {
-                    out << (a < 0 ? "-" : "+") << "(" <<  std::abs(a) << ")";
-                }
-            };
-            if (1 < std::abs(line.slope)) {
-                out << "x=(" << (1 / line.slope) << ")y";
-                adda(line.intercept.x - line.intercept.y / line.slope);
-            } else {
-                out << "y=(" << line.slope << ")x";
-                adda(line.intercept.y - line.intercept.x * line.slope);
-            }
-            return out;
-        }
-    };
+    Vector_2 convert(cv::Vec2d a);
+    cv::Vec2d convert(Vector_2 a);
 
-    cv::Vec2f normVec(const cv::Vec2f src);
-    cv::Vec2f rotateVec(const float angle, const cv::Vec2f src);
+    Aff_transformation_2 mkRotation(double angle);
+
+    Point_2 center(Iso_rectangle_2 rect);
 }
+
+#endif

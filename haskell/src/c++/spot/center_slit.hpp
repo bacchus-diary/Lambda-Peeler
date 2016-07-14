@@ -1,6 +1,14 @@
 #ifndef CENTER_SLIT_H
 #define CENTER_SLIT_H
 
+#include <iostream>
+
+#include "opencv2/core.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/opencv.hpp"
+
+#include "../util/geometry.hpp"
+
 struct Detected {
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat desc;
@@ -10,7 +18,7 @@ class CenterSlit {
 private:
     cv::Mat marged;
     Detected previous;
-    cv::Vec2f moved;
+    cv::Vec2d moved;
 public:
     CenterSlit();
     void addFrame(cv::Mat frame);
