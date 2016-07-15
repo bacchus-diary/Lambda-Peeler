@@ -22,7 +22,7 @@ extern "C" {
     void loadVideo(char *videoFile) {
         printf("Capturing video: %s\n", videoFile);
         const auto startTime = std::chrono::system_clock::now();
-        auto byMS = [](std::chrono::system_clock::time_point t) {
+        const auto byMS = [](std::chrono::system_clock::time_point t) {
             const auto d = std::chrono::system_clock::now() - t;
             return std::chrono::duration_cast<std::chrono::milliseconds>(d).count();
         };

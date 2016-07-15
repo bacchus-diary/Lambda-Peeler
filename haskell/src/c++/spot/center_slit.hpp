@@ -10,16 +10,12 @@
 #include "../util/geometry.hpp"
 #include "match_points.hpp"
 
-struct Detected {
-    std::vector<cv::KeyPoint> keypoints;
-    cv::Mat desc;
-};
-
 class CenterSlit {
 private:
     cv::Mat marged;
     Detected previous;
     cv::Vec2d moved;
+    MatchPoints spots;
 public:
     CenterSlit();
     void addFrame(const cv::Mat &frame);
