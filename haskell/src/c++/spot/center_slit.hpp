@@ -8,6 +8,7 @@
 #include "opencv2/opencv.hpp"
 
 #include "../util/geometry.hpp"
+#include "match_points.hpp"
 
 struct Detected {
     std::vector<cv::KeyPoint> keypoints;

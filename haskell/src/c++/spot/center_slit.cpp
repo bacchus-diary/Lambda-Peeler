@@ -3,18 +3,6 @@
 cv::Ptr<cv::Feature2D> feature = cv::AKAZE::create();
 cv::BFMatcher matcher(feature->defaultNorm(), true);
 
-struct MatchPoint {
-    MatchPoint() {}
-    MatchPoint(cv::DMatch m, cv::KeyPoint a, cv::KeyPoint b) {
-        match = m;
-        pre = a;
-        post = b;
-    }
-    cv::DMatch match;
-    cv::KeyPoint pre;
-    cv::KeyPoint post;
-};
-
 std::pair<std::vector<MatchPoint>, Detected> matchPoints(const Detected &previous, const Detected &current) {
     std::vector<MatchPoint> result;
     Detected reduced;
