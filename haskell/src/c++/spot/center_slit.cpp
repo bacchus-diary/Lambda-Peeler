@@ -15,7 +15,7 @@ struct MatchPoint {
     cv::KeyPoint post;
 };
 
-std::pair<std::vector<MatchPoint>, Detected> matchPoints(Detected previous, Detected current) {
+std::pair<std::vector<MatchPoint>, Detected> matchPoints(const Detected &previous, const Detected &current) {
     std::vector<MatchPoint> result;
     Detected reduced;
 
@@ -40,7 +40,7 @@ std::pair<std::vector<MatchPoint>, Detected> matchPoints(Detected previous, Dete
     return std::make_pair(result, reduced);
 }
 
-cv::Vec2d findDirection(std::vector<MatchPoint> points) {
+cv::Vec2d findDirection(const std::vector<MatchPoint> &points) {
     float x = 0;
     float y = 0;
     for (auto p: points) {
@@ -51,7 +51,7 @@ cv::Vec2d findDirection(std::vector<MatchPoint> points) {
     return cv::Vec2d(x / points.size(), y / points.size());
 }
 
-double lengthOfIntersect(geometry::Iso_rectangle_2 rect, geometry::Direction_2 direction) {
+double lengthOfIntersect(const geometry::Iso_rectangle_2 &rect, const geometry::Direction_2 &direction) {
     auto ins = CGAL::intersection(rect, geometry::Line_2(geometry::center(rect), direction));
     if (ins) {
         if (const geometry::Segment_2* s = boost::get<geometry::Segment_2>(&*ins)) {
@@ -67,7 +67,20 @@ double lengthOfIntersect(geometry::Iso_rectangle_2 rect, geometry::Direction_2 d
     return (double)NAN;
 }
 
-geometry::Line_2 findCenter(const cv::Mat frame, const std::vector<MatchPoint> points, const geometry::Direction_2 horizon) {
+MatchPoint nearest(const geometry::Point_2 &p, const std::vector<MatchPoint> &points) {
+    MatchPoint result;
+    double d = -1;
+    for (auto o: points) {
+        const double od = CGAL::squared_distance(p, geometry::convert(o.pre.pt));
+        if (d < 0 || od != 0 && od < d) {
+            result = o;
+            d = od;
+        }
+    }
+    return result;
+}
+
+geometry::Line_2 findCenter(const cv::Mat &frame, const std::vector<MatchPoint> &points, const geometry::Direction_2 &horizon) {
     geometry::Iso_rectangle_2 rect(0, 0, frame.cols, frame.rows);
 
     const double width = lengthOfIntersect(rect, horizon);
@@ -81,19 +94,8 @@ geometry::Line_2 findCenter(const cv::Mat frame, const std::vector<MatchPoint> p
         const auto p = geometry::convert(mp.pre.pt);
         const auto d = CGAL::squared_distance(centerV, p);
         if (d < ep) {
-            MatchPoint nearest;
-            double n = -1;
-            for (auto o: points) {
-                const auto op = geometry::convert(o.pre.pt);
-                if (op != p) {
-                    const double od = CGAL::squared_distance(p, op);
-                    if (n < 0 || od < n) {
-                        nearest = o;
-                        n = od;
-                    }
-                }
-            }
-            std::cout << "Neiborgh of [" << p << "]: " << nearest.pre.pt << std::endl;
+            auto neighbor = nearest(p, points);
+            std::cout << "Neiborgh of [" << p << "]: " << neighbor.pre.pt << std::endl;
         }
     }
 
@@ -109,7 +111,7 @@ cv::Mat CenterSlit::getMarged() {
     return marged;
 }
 
-void CenterSlit::addFrame(cv::Mat frame) {
+void CenterSlit::addFrame(const cv::Mat &frame) {
     Detected current;
     feature->detectAndCompute(frame, cv::noArray(), current.keypoints, current.desc);
     std::cout << "Detected keypoints=" << current.keypoints.size() << std::endl;
@@ -117,7 +119,7 @@ void CenterSlit::addFrame(cv::Mat frame) {
         marged = frame;
     } else {
         std::vector<MatchPoint> points;
-        std:tie(points, current) = matchPoints(previous, current);
+        std::tie(points, current) = matchPoints(previous, current);
         std::cout << "Matched Points: " << points.size() << std::endl;
 
         const auto d = findDirection(points);

@@ -21,7 +21,7 @@ private:
     cv::Vec2d moved;
 public:
     CenterSlit();
-    void addFrame(cv::Mat frame);
+    void addFrame(const cv::Mat &frame);
     cv::Mat getMarged();
 };
 

@@ -36,15 +36,15 @@ namespace geometry {
 
     double toRadian(double angle);
 
-    Point_2 convert(cv::Point2d a);
-    cv::Point2d convert(Point_2 a);
+    Point_2 convert(const cv::Point2d &a);
+    cv::Point2d convert(const Point_2 &a);
 
-    Vector_2 convert(cv::Vec2d a);
-    cv::Vec2d convert(Vector_2 a);
+    Vector_2 convert(const cv::Vec2d &a);
+    cv::Vec2d convert(const Vector_2 &a);
 
     Aff_transformation_2 mkRotation(double angle);
 
-    Point_2 center(Iso_rectangle_2 rect);
+    Point_2 center(const Iso_rectangle_2 &rect);
 }
 
 #endif
