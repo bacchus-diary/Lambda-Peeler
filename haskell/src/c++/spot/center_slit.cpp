@@ -11,9 +11,10 @@ std::pair<std::vector<MatchPoint>, Detected> matchPoints(const Detected &previou
     matcher.match(previous.desc, current.desc, matches);
 
     for (auto m: matches) {
-        MatchPoint mp(m
+        MatchPoint mp = {m
             , previous.keypoints[m.queryIdx]
-            , current.keypoints[m.trainIdx]);
+            , current.keypoints[m.trainIdx]
+        };
         result.push_back(mp);
 
         reduced.keypoints.push_back(mp.post);
