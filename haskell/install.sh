@@ -21,8 +21,8 @@ do
     echo "Adding '$EXTRA_LIB' to $target"
     patchelf --add-needed $EXTRA_LIB $target
 
-    ldd $target | awk '{print $(NF-1)}' | grep -v /var/task | while read lib
+    ldd $target | awk '{print $(NF-1)}' | grep /.stack | while read lib
     do
-        [ -f $lib ] && cp -vu $lib $lib_dir || echo "Skip '$lib'"
+        cp -vu $lib $lib_dir
     done
 done
