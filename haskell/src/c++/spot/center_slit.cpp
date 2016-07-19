@@ -33,7 +33,7 @@ geometry::Line_2 findCenter(const cv::Mat &frame, const MatchPoints &points, con
         const auto p = spot.lastPoint();
         const auto d = sqrt(CGAL::squared_distance(centerV, p));
         if (d < ep) {
-            const auto neighbor = points.nearest(p);
+            const auto neighbor = points.nearest(spot);
             if (neighbor) {
                 const auto v = neighbor->lastPoint() - p;
                 std::cout << "Neiborgh: " << v << std::endl;

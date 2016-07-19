@@ -27,6 +27,14 @@ void Spot::addPoint(const cv::KeyPoint &key) {
     last = geometry::convert(key.pt);
 }
 
+boost::optional<cv::KeyPoint> Spot::atFrame(const int index) const {
+    boost::optional<cv::KeyPoint> result;
+    if (start() <= index && index <= end()) {
+        result = keypoints[index - start() + 1];
+    }
+    return result;
+}
+
 MatchPoints::MatchPoints(const cv::BFMatcher &_matcher) {
     index = 0;
     matcher = _matcher;
@@ -81,14 +89,20 @@ geometry::Vector_2 MatchPoints::movement() const {
     return geometry::Vector_2(x, y);
 }
 
-boost::optional<Spot> MatchPoints::nearest(const geometry::Point_2 &p) const {
+boost::optional<Spot> MatchPoints::nearest(const Spot &spot) const {
+    const auto p = spot.lastPoint();
+    const int frameIndex = spot.end();
+
     boost::optional<Spot> result;
     double d = -1;
     eachSpot([&](const Spot &s) {
-        const double od = CGAL::squared_distance(p, s.lastPoint());
-        if (d < 0 || od != 0 && od < d) {
-            result = s;
-            d = od;
+        const auto key = s.atFrame(frameIndex);
+        if (key) {
+            const double od = CGAL::squared_distance(p, geometry::convert(key->pt));
+            if (d < 0 || od != 0 && od < d) {
+                result = s;
+                d = od;
+            }
         }
     });
     return result;

@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include <boost/optional.hpp>
-#include <boost/optional/optional_io.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "../util/geometry.hpp"
@@ -29,6 +28,7 @@ public:
     geometry::Vector_2 movement() const;
 
     void addPoint(const cv::KeyPoint &key);
+    boost::optional<cv::KeyPoint> atFrame(const int index) const;
 };
 
 class MatchPoints {
@@ -41,7 +41,7 @@ public:
     MatchPoints(const cv::BFMatcher &_matcher);
     void match(const Detected &previous, const Detected &current);
     geometry::Vector_2 movement() const;
-    boost::optional<Spot> nearest(const geometry::Point_2 &p) const;
+    boost::optional<Spot> nearest(const Spot &spot) const;
     void eachSpot(const std::function<void(Spot)> func) const;
 };
 
