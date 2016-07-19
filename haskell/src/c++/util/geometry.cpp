@@ -25,7 +25,9 @@ namespace geometry {
         return result;
     }
 
-    Point_2 center(const Iso_rectangle_2 &rect) {
-        return Point_2(rect.xmax() - rect.xmin(), rect.ymax() - rect.ymin());
+    Point_2 centerOf(const Iso_rectangle_2 &rect) {
+        const auto x = (rect.xmax() - rect.xmin()) / 2;
+        const auto y = (rect.ymax() - rect.ymin()) / 2;
+        return Point_2(x, y);
     }
 }

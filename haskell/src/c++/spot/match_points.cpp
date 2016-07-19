@@ -40,11 +40,11 @@ void MatchPoints::match(const Detected &previous, const Detected &current) {
     const auto findSpot = [&](const int preIndex) {
         auto found = indexedSpots.find(preIndex);
         if (found != indexedSpots.end()) {
-            return found->second;
+            auto result = found->second;
+            indexedSpots.erase(found);
+            return result;
         } else {
-            const auto s = Spot(index, previous.keypoints[preIndex]);
-            spots.push_back(s);
-            return s;
+            return Spot(index, previous.keypoints[preIndex]);
         }
     };
 
@@ -55,40 +55,52 @@ void MatchPoints::match(const Detected &previous, const Detected &current) {
         next.insert(std::make_pair(m.trainIdx, found));
     }
     std::cout << "Matched spots: " << next.size() << std::endl;
+    auto itr = indexedSpots.begin();
+    while (itr != indexedSpots.end()) {
+        spots.push_back(itr->second);
+        ++itr;
+    }
+    std::cout << "Add passed spots: " << indexedSpots.size() << std::endl;
     indexedSpots = next;
 }
 
 geometry::Vector_2 MatchPoints::movement() const {
-    const int total = spots.size();
+    int total = 0;
     double x = 0, y = 0;
-    if (0 < total) {
-        for (auto s: spots) {
+    if (!spots.empty() || !indexedSpots.empty()) {
+        eachSpot([&](const Spot &s) {
             const auto m = s.movement();
             x += m.x();
             y += m.y();
-        }
+            total++;
+        });
         x /= total;
         y /= total;
     }
-    std::cout << "Sum of movements (" << total << "): " << x << ", " << y << std::endl;
+    std::cout << "Ave of movements (" << total << "): " << x << ", " << y << std::endl;
     return geometry::Vector_2(x, y);
 }
 
-Spot MatchPoints::nearest(const geometry::Point_2 &p) const {
-    Spot *result;
+boost::optional<Spot> MatchPoints::nearest(const geometry::Point_2 &p) const {
+    boost::optional<Spot> result;
     double d = -1;
-    for (auto s: spots) {
+    eachSpot([&](const Spot &s) {
         const double od = CGAL::squared_distance(p, s.lastPoint());
         if (d < 0 || od != 0 && od < d) {
-            *result = s;
+            result = s;
             d = od;
         }
-    }
-    return *result;
+    });
+    return result;
 }
 
 void MatchPoints::eachSpot(const std::function<void(Spot)> func) const {
     for (auto s: spots) {
         func(s);
+    }
+    auto itr = indexedSpots.begin();
+    while (itr != indexedSpots.end()) {
+        func(itr->second);
+        ++itr;
     }
 }

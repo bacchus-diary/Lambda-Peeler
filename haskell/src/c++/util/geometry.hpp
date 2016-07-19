@@ -44,7 +44,7 @@ namespace geometry {
 
     Aff_transformation_2 mkRotation(double angle);
 
-    Point_2 center(const Iso_rectangle_2 &rect);
+    Point_2 centerOf(const Iso_rectangle_2 &rect);
 }
 
 #endif
