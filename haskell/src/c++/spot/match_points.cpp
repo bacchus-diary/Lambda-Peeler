@@ -1,5 +1,31 @@
 #include "match_points.hpp"
 
+
+void Detected::sortAndReduce(const double rate) {
+    std::cout << "Sorting keypoints=" << keypoints.size() << ", desc=" << desc.rows << std::endl;
+    std::vector<std::pair<cv::KeyPoint, cv::Mat>> pairs;
+    int index = 0;
+    for (auto key: keypoints) {
+        pairs.push_back(std::make_pair(key, desc.row(index++)));
+    }
+    const int needed = pairs.size() * rate;
+
+    std::partial_sort(pairs.begin(), pairs.begin() + needed, pairs.end(), [](std::pair<cv::KeyPoint, cv::Mat> a, std::pair<cv::KeyPoint, cv::Mat> b) {
+        return a.first.octave < b.first.octave;
+    });
+    std::cout << "Sorted pairs: " << pairs.size() << std::endl;
+
+    keypoints.clear();
+    desc.resize(0);
+    std::cout << "Detected cleared: " << desc << std::endl;
+
+    std::vector<std::pair<cv::KeyPoint, cv::Mat>> reduced(pairs.begin(), pairs.begin() + needed);
+    for (auto pair: reduced) {
+        keypoints.push_back(pair.first);
+        desc.push_back(pair.second);
+    }
+}
+
 Spot::Spot(const int startIndex, const cv::KeyPoint &key) {
     startFrame = startIndex - 1;
     addPoint(key);

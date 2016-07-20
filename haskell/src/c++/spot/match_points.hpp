@@ -8,9 +8,12 @@
 
 #include "../util/geometry.hpp"
 
-struct Detected {
+class Detected {
+public:
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat desc;
+
+    void sortAndReduce(const double rate);
 };
 
 class Spot {
