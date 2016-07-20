@@ -52,11 +52,19 @@ geometry::Line_2 findCenter(const cv::Mat &frame, const MatchPoints &points, con
             }
             return result;
         };
+        geometry::Vector_2 va(0, 0);
+        std::vector<geometry::Vector_2> vs;
         boost::optional<geometry::Point_2> spt, npt;
         while ((spt = getPt(spot)) && (npt = getPt(neighbor))) {
             const auto v = *npt - *spt;
+            va = va + v;
+            vs.push_back(v);
             frameIndex--;
         }
+        va = va / vs.size();
+        const auto ma = (vs.front() - vs.back()) / vs.size();
+        geometry::Vector_2 mv(ma.x() / va.x(), ma.y() / va.y());
+        std::cout << "Average mv: " << mv << std::endl;
     });
     return centerV;
 }
