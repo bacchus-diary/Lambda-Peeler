@@ -1,7 +1,7 @@
 #include "match_points.hpp"
 
 Spot::Spot(const int startIndex, const cv::KeyPoint &key) {
-    startFrame = startIndex;
+    startFrame = startIndex - 1;
     addPoint(key);
     first = last;
 }
@@ -11,7 +11,7 @@ int Spot::start() const {
 }
 
 int Spot::end() const {
-    return startFrame + keypoints.size() - 2;
+    return startFrame + keypoints.size() - 1;
 }
 
 const geometry::Point_2 &Spot::lastPoint() const {
@@ -30,7 +30,7 @@ void Spot::addPoint(const cv::KeyPoint &key) {
 boost::optional<cv::KeyPoint> Spot::atFrame(const int index) const {
     boost::optional<cv::KeyPoint> result;
     if (start() <= index && index <= end()) {
-        result = keypoints[index - start() + 1];
+        result = keypoints[index - start()];
     }
     return result;
 }
