@@ -2,25 +2,27 @@
 
 
 void Detected::sortAndReduce(const double rate) {
+    typedef std::pair<cv::KeyPoint, cv::Mat> KM;
+
     std::cout << "Sorting keypoints=" << keypoints.size() << ", desc.rows=" << desc.rows << std::endl;
-    std::vector<std::pair<cv::KeyPoint, cv::Mat>> pairs;
+    std::vector<KM> pairs;
     int index = 0;
     for (auto key: keypoints) {
         pairs.push_back(std::make_pair(key, desc.row(index++)));
     }
-    const int needed = pairs.size() * rate;
+    const int needs = pairs.size() * rate;
 
-    std::partial_sort(pairs.begin(), pairs.begin() + needed, pairs.end(), [](std::pair<cv::KeyPoint, cv::Mat> a, std::pair<cv::KeyPoint, cv::Mat> b) {
+    std::partial_sort(pairs.begin(), pairs.begin() + needs, pairs.end(), [](KM a, KM b) {
         return b.first.octave < a.first.octave;
     });
 
     keypoints.clear();
     desc.resize(0);
 
-    std::vector<std::pair<cv::KeyPoint, cv::Mat>> reduced(pairs.begin(), pairs.begin() + needed);
-    for (auto pair: reduced) {
-        keypoints.push_back(pair.first);
-        desc.push_back(pair.second);
+    std::vector<std::pair<cv::KeyPoint, cv::Mat>> reduced(pairs.begin(), pairs.begin() + needs);
+    for (auto d: reduced) {
+        keypoints.push_back(d.first);
+        desc.push_back(d.second);
     }
 }
 
