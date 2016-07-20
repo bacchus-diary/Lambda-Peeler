@@ -27,36 +27,37 @@ geometry::Line_2 findCenter(const cv::Mat &frame, const MatchPoints &points, con
     const auto centerV = centerH.perpendicular(center);
 
     const auto w = lengthOfIntersect(rect, centerH);
-    if (w) {
-        const double width = *w;
-        std::cout << "Width: " << width << std::endl;
-        const double ep = width / 10;
-        std::cout << "Around center: " << ep << std::endl;
+    if (!w) return centerV;
+    const double width = *w;
 
-        points.eachSpot([&](const Spot &spot) {
-            const auto p = spot.lastPoint();
-            const auto d = sqrt(CGAL::squared_distance(centerV, p));
-            if (d < ep) {
-                const auto neighbor = points.nearest(spot);
-                if (neighbor) {
-                    int frameIndex = spot.end();
-                    const auto getPt = [&frameIndex](const Spot &s) {
-                        boost::optional<geometry::Point_2> result;
-                        const auto key = s.atFrame(frameIndex);
-                        if (key) {
-                            result = geometry::convert(key->pt);
-                        }
-                        return result;
-                    };
-                    boost::optional<geometry::Point_2> spt, npt;
-                    while ((spt = getPt(spot)) && (npt = getPt(*neighbor))) {
-                        const auto v = *npt - *spt;
-                        frameIndex--;
-                    }
-                }
+    std::cout << "Width: " << width << std::endl;
+    const double ep = width / 10;
+    std::cout << "Around center: " << ep << std::endl;
+
+    points.eachSpot([&](const Spot &spot) {
+        const auto p = spot.lastPoint();
+        const auto d = sqrt(CGAL::squared_distance(centerV, p));
+        if (ep < d) return;
+
+        const auto n = points.nearest(spot);
+        if (!n) return;
+        const auto neighbor = *n;
+
+        int frameIndex = spot.end();
+        const auto getPt = [&frameIndex](const Spot &s) {
+            boost::optional<geometry::Point_2> result;
+            const auto key = s.atFrame(frameIndex);
+            if (key) {
+                result = geometry::convert(key->pt);
             }
-        });
-    }
+            return result;
+        };
+        boost::optional<geometry::Point_2> spt, npt;
+        while ((spt = getPt(spot)) && (npt = getPt(neighbor))) {
+            const auto v = *npt - *spt;
+            frameIndex--;
+        }
+    });
     return centerV;
 }
 
