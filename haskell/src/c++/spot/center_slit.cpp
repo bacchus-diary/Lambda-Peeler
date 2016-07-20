@@ -3,12 +3,13 @@
 cv::Ptr<cv::Feature2D> feature = cv::AKAZE::create();
 cv::BFMatcher matcher(feature->defaultNorm(), true);
 
-double lengthOfIntersect(const geometry::Iso_rectangle_2 &rect, const geometry::Direction_2 &direction) {
-    auto ins = CGAL::intersection(rect, geometry::Line_2(geometry::centerOf(rect), direction));
+boost::optional<double> lengthOfIntersect(const geometry::Iso_rectangle_2 &rect, const geometry::Line_2 &line) {
+    boost::optional<double> result;
+    auto ins = CGAL::intersection(rect, line);
     if (ins) {
         if (const geometry::Segment_2* s = boost::get<geometry::Segment_2>(&*ins)) {
             std::cout << "Horizontal segment: " << *s << std::endl;
-            return sqrt(s->squared_length());
+            result = sqrt(s->squared_length());
         } else {
             const geometry::Point_2* p = boost::get<geometry::Point_2>(&*ins);
             std::cerr << "No intersection line of center, but point: " << *p << std::endl;
@@ -16,31 +17,46 @@ double lengthOfIntersect(const geometry::Iso_rectangle_2 &rect, const geometry::
     } else {
         std::cerr << "No intersection of center." << std::endl;
     }
-    return (double)NAN;
+    return result;
 }
 
 geometry::Line_2 findCenter(const cv::Mat &frame, const MatchPoints &points, const geometry::Direction_2 &horizon) {
     geometry::Iso_rectangle_2 rect(0, 0, frame.cols, frame.rows);
+    const auto center = geometry::centerOf(rect);
+    const auto centerH = geometry::Line_2(center, horizon);
+    const auto centerV = centerH.perpendicular(center);
 
-    const double width = lengthOfIntersect(rect, horizon);
-    std::cout << "Width: " << width << std::endl;
+    const auto w = lengthOfIntersect(rect, centerH);
+    if (w) {
+        const double width = *w;
+        std::cout << "Width: " << width << std::endl;
+        const double ep = width / 10;
+        std::cout << "Around center: " << ep << std::endl;
 
-    geometry::Line_2 centerV(geometry::centerOf(rect), geometry::mkRotation(90)(horizon));
-
-    const double ep = width / 10;
-    std::cout << "Around center: " << ep << std::endl;
-    points.eachSpot([&](const Spot &spot) {
-        const auto p = spot.lastPoint();
-        const auto d = sqrt(CGAL::squared_distance(centerV, p));
-        if (d < ep) {
-            const auto neighbor = points.nearest(spot);
-            if (neighbor) {
-                const auto v = neighbor->lastPoint() - p;
-                std::cout << "Neiborgh: " << v << std::endl;
+        points.eachSpot([&](const Spot &spot) {
+            const auto p = spot.lastPoint();
+            const auto d = sqrt(CGAL::squared_distance(centerV, p));
+            if (d < ep) {
+                const auto neighbor = points.nearest(spot);
+                if (neighbor) {
+                    int frameIndex = spot.end();
+                    const auto getPt = [&frameIndex](const Spot &s) {
+                        boost::optional<geometry::Point_2> result;
+                        const auto key = s.atFrame(frameIndex);
+                        if (key) {
+                            result = geometry::convert(key->pt);
+                        }
+                        return result;
+                    };
+                    boost::optional<geometry::Point_2> spt, npt;
+                    while ((spt = getPt(spot)) && (npt = getPt(*neighbor))) {
+                        const auto v = *npt - *spt;
+                        frameIndex--;
+                    }
+                }
             }
-        }
-    });
-
+        });
+    }
     return centerV;
 }
 
