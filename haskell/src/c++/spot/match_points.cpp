@@ -2,7 +2,7 @@
 
 
 void Detected::sortAndReduce(const double rate) {
-    std::cout << "Sorting keypoints=" << keypoints.size() << ", desc=" << desc.rows << std::endl;
+    std::cout << "Sorting keypoints=" << keypoints.size() << ", desc.rows=" << desc.rows << std::endl;
     std::vector<std::pair<cv::KeyPoint, cv::Mat>> pairs;
     int index = 0;
     for (auto key: keypoints) {
@@ -11,13 +11,11 @@ void Detected::sortAndReduce(const double rate) {
     const int needed = pairs.size() * rate;
 
     std::partial_sort(pairs.begin(), pairs.begin() + needed, pairs.end(), [](std::pair<cv::KeyPoint, cv::Mat> a, std::pair<cv::KeyPoint, cv::Mat> b) {
-        return a.first.octave < b.first.octave;
+        return b.first.octave < a.first.octave;
     });
-    std::cout << "Sorted pairs: " << pairs.size() << std::endl;
 
     keypoints.clear();
     desc.resize(0);
-    std::cout << "Detected cleared: " << desc << std::endl;
 
     std::vector<std::pair<cv::KeyPoint, cv::Mat>> reduced(pairs.begin(), pairs.begin() + needed);
     for (auto pair: reduced) {
