@@ -42,6 +42,7 @@ extern "C" {
             printf("Detecting points at frame[%d]\n", i);
             slit.addFrame(rotateByAngle(frame, -90.0));
             i++;
+            std::cout << std::endl;
         }
         const auto timeLoad = byMS(startTime);
         cout << "Finish load video. capture: " << timeCapture << "ms, " << (timeLoad - timeCapture)/i << "ms/frame" << endl;

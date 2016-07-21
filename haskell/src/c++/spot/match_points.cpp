@@ -1,29 +1,32 @@
 #include "match_points.hpp"
 
-
 void Detected::sortAndReduce(const double rate) {
-    typedef std::pair<cv::KeyPoint, cv::Mat> KM;
+    assert(keypoints.size() == desc.rows);
+    std::cout << "Sorting keypoints=" << keypoints.size() << std::endl;
 
-    std::cout << "Sorting keypoints=" << keypoints.size() << ", desc.rows=" << desc.rows << std::endl;
-    std::vector<KM> pairs;
+    typedef std::pair<int, int> PK;
+
+    std::vector<PK> pairs;
     int index = 0;
     for (auto key: keypoints) {
-        pairs.push_back(std::make_pair(key, desc.row(index++)));
+        pairs.push_back(std::make_pair(key.octave, index++));
     }
     const int needs = pairs.size() * rate;
 
-    std::partial_sort(pairs.begin(), pairs.begin() + needs, pairs.end(), [](KM a, KM b) {
-        return b.first.octave < a.first.octave;
+    std::partial_sort(pairs.begin(), pairs.begin() + needs, pairs.end(), [](const PK &a, const PK &b) {
+        return b.first < a.first;
     });
 
-    keypoints.clear();
-    desc.resize(0);
+    std::vector<cv::KeyPoint> tmpVec;
+    cv::Mat tmpMat(0, desc.cols, desc.type());
 
-    std::vector<std::pair<cv::KeyPoint, cv::Mat>> reduced(pairs.begin(), pairs.begin() + needs);
-    for (auto d: reduced) {
-        keypoints.push_back(d.first);
-        desc.push_back(d.second);
+    for (auto itr = pairs.cbegin(); itr != pairs.cbegin() + needs; ++itr) {
+        const int i = itr->second;
+        tmpVec.push_back(keypoints[i]);
+        tmpMat.push_back(desc.row(i));
     }
+    keypoints = tmpVec;
+    desc = tmpMat;
 }
 
 Spot::Spot(const int startIndex, const cv::KeyPoint &key) {
