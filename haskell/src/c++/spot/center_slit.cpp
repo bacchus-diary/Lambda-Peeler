@@ -78,15 +78,24 @@ cv::Mat CenterSlit::getMarged() {
 }
 
 void CenterSlit::addFrame(const cv::Mat &frame) {
+    const auto startTime = std::chrono::system_clock::now();
+    const auto takeTime = [&startTime](const std::string &msg) {
+        const auto d = std::chrono::system_clock::now() - startTime;
+        const auto t = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+        std::cout << "CenterSlit::addFrame: " << t.count() << "ms" << " : " << msg << std::endl;
+    };
+
     Detected current;
-    feature->detectAndCompute(frame, cv::noArray(), current.keypoints, current.desc);
-    current.sortAndReduce();
+    current.detectAndCompute(frame, feature);
+    takeTime("Detected.");
     std::cout << "Detected keypoints=" << current.keypoints.size() << std::endl;
     if (previous.desc.rows < 1) {
         marged = frame;
     } else {
         spots.match(previous, current);
+        takeTime("Matched.");
         const auto hvec = spots.movement();
+        takeTime("Took movement.");
         const auto th = frame.cols / 100;
         std::cout << "Points movements (" << th << "): " << hvec << std::endl;
         if (th < sqrt(hvec.squared_length())) {
@@ -94,4 +103,5 @@ void CenterSlit::addFrame(const cv::Mat &frame) {
         }
     }
     previous = current;
+    takeTime("Finish.");
 }

@@ -1,23 +1,28 @@
 #include "match_points.hpp"
 
-void Detected::sortAndReduce() {
-    assert(keypoints.size() == desc.rows);
-    std::cout << "Sorting keypoints=" << keypoints.size() << std::endl;
+void Detected::detectAndCompute(const cv::Mat &frame, const cv::Ptr<cv::Feature2D> &feature) {
+    const auto startTime = std::chrono::system_clock::now();
+    const auto takeTime = [&startTime](const std::string &msg) {
+        const auto d = std::chrono::system_clock::now() - startTime;
+        const auto t = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+        std::cout << "Detected::detectAndCompute: " << t.count() << "ms" << " : " << msg << std::endl;
+    };
 
     std::vector<cv::KeyPoint> tmpVec;
-    cv::Mat tmpMat(0, desc.cols, desc.type());
 
-    int index = 0;
-    for (auto key: keypoints) {
+    feature->detect(frame, tmpVec);
+    takeTime("Detected.");
+    std::cout << "Reducing keypoints=" << tmpVec.size() << std::endl;
+
+    for (auto key: tmpVec) {
         if (1 < key.octave) {
-            tmpVec.push_back(key);
-            tmpMat.push_back(desc.row(index));
+            keypoints.push_back(key);
         }
-        ++index;
     }
+    takeTime("Reduced.");
 
-    keypoints = tmpVec;
-    desc = tmpMat;
+    feature->compute(frame, keypoints, desc);
+    takeTime("Computed.");
 }
 
 Spot::Spot(const int startIndex, const cv::KeyPoint &key) {

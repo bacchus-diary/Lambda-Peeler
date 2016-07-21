@@ -2,6 +2,7 @@
 #define CENTER_SLIT_H
 
 #include <iostream>
+#include <chrono>
 
 #include "opencv2/core.hpp"
 #include "opencv2/highgui.hpp"

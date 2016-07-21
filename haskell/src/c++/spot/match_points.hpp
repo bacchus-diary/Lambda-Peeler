@@ -2,6 +2,7 @@
 #define MATCH_POINTS_H
 
 #include <iostream>
+#include <chrono>
 
 #include <boost/optional.hpp>
 #include <opencv2/opencv.hpp>
@@ -13,7 +14,7 @@ public:
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat desc;
 
-    void sortAndReduce();
+    void detectAndCompute(const cv::Mat &frame, const cv::Ptr<cv::Feature2D> &feature);
 };
 
 class Spot {
