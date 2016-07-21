@@ -1,30 +1,21 @@
 #include "match_points.hpp"
 
-void Detected::sortAndReduce(const double rate) {
+void Detected::sortAndReduce() {
     assert(keypoints.size() == desc.rows);
     std::cout << "Sorting keypoints=" << keypoints.size() << std::endl;
-
-    typedef std::pair<int, int> PK;
-
-    std::vector<PK> pairs;
-    int index = 0;
-    for (auto key: keypoints) {
-        pairs.push_back(std::make_pair(key.octave, index++));
-    }
-    const int needs = pairs.size() * rate;
-
-    std::partial_sort(pairs.begin(), pairs.begin() + needs, pairs.end(), [](const PK &a, const PK &b) {
-        return b.first < a.first;
-    });
 
     std::vector<cv::KeyPoint> tmpVec;
     cv::Mat tmpMat(0, desc.cols, desc.type());
 
-    for (auto itr = pairs.cbegin(); itr != pairs.cbegin() + needs; ++itr) {
-        const int i = itr->second;
-        tmpVec.push_back(keypoints[i]);
-        tmpMat.push_back(desc.row(i));
+    int index = 0;
+    for (auto key: keypoints) {
+        if (1 < key.octave) {
+            tmpVec.push_back(key);
+            tmpMat.push_back(desc.row(index));
+        }
+        ++index;
     }
+
     keypoints = tmpVec;
     desc = tmpMat;
 }

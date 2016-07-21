@@ -80,7 +80,7 @@ cv::Mat CenterSlit::getMarged() {
 void CenterSlit::addFrame(const cv::Mat &frame) {
     Detected current;
     feature->detectAndCompute(frame, cv::noArray(), current.keypoints, current.desc);
-    current.sortAndReduce(0.1);
+    current.sortAndReduce();
     std::cout << "Detected keypoints=" << current.keypoints.size() << std::endl;
     if (previous.desc.rows < 1) {
         marged = frame;

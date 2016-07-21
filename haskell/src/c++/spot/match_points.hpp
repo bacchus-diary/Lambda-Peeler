@@ -13,7 +13,7 @@ public:
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat desc;
 
-    void sortAndReduce(const double rate);
+    void sortAndReduce();
 };
 
 class Spot {
