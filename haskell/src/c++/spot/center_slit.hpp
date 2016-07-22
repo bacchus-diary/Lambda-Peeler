@@ -17,10 +17,12 @@ private:
     Detected previous;
     cv::Vec2d moved;
     MatchPoints spots;
+    int sizeOfFrame;
 public:
     CenterSlit();
     void addFrame(const cv::Mat &frame);
     cv::Mat getMarged();
+    int getSizeOfFrame();
 };
 
 #endif

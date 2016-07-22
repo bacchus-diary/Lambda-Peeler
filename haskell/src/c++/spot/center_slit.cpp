@@ -69,7 +69,7 @@ geometry::Line_2 findCenter(const cv::Mat &frame, const MatchPoints &points, con
     return centerV;
 }
 
-CenterSlit::CenterSlit(): spots(matcher), moved(0, 0) {
+CenterSlit::CenterSlit(): spots(matcher), moved(0, 0), sizeOfFrame(0) {
     std::cout << "Initializing empty CenterSlit..." << std::endl;
 }
 
@@ -85,6 +85,7 @@ void CenterSlit::addFrame(const cv::Mat &frame) {
         std::cout << "CenterSlit::addFrame: " << t.count() << "ms" << " : " << msg << std::endl;
     };
 
+    printf("Detecting points at frame[%d]\n", sizeOfFrame);
     Detected current;
     current.detectAndCompute(frame, feature);
     takeTime("Detected.");
@@ -103,5 +104,10 @@ void CenterSlit::addFrame(const cv::Mat &frame) {
         }
     }
     previous = current;
+    sizeOfFrame++;
     takeTime("Finish.");
+}
+
+int CenterSlit::getSizeOfFrame() {
+    return sizeOfFrame;
 }

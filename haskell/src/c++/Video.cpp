@@ -37,15 +37,12 @@ extern "C" {
         CenterSlit slit;
         Mat frame;
 
-        int i = 0;
-        while (i < 10 && capture.read(frame)) {
-            printf("Detecting points at frame[%d]\n", i);
+        while (slit.getSizeOfFrame() < 10 && capture.read(frame)) {
             slit.addFrame(rotateByAngle(frame, -90.0));
-            i++;
             std::cout << std::endl;
         }
         const auto timeLoad = byMS(startTime);
-        cout << "Finish load video. capture: " << timeCapture << "ms, " << (timeLoad - timeCapture)/i << "ms/frame" << endl;
+        cout << "Finish load video. capture: " << timeCapture << "ms, " << (timeLoad - timeCapture)/slit.getSizeOfFrame() << "ms/frame" << endl;
         capture.release();
         imwrite("resources/out/slit_marged.jpg", slit.getMarged());
     }
