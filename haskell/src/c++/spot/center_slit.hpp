@@ -18,6 +18,8 @@ private:
     cv::Vec2d moved;
     MatchPoints spots;
     int sizeOfFrame;
+
+    geometry::Line_2 findCenter(const cv::Mat &frame, const geometry::Direction_2 &horizon);
 public:
     CenterSlit();
     void addFrame(const cv::Mat &frame);

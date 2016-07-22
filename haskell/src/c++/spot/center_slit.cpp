@@ -20,7 +20,7 @@ boost::optional<double> lengthOfIntersect(const geometry::Iso_rectangle_2 &rect,
     return result;
 }
 
-geometry::Line_2 findCenter(const cv::Mat &frame, const MatchPoints &points, const geometry::Direction_2 &horizon) {
+geometry::Line_2 CenterSlit::findCenter(const cv::Mat &frame, const geometry::Direction_2 &horizon) {
     geometry::Iso_rectangle_2 rect(0, 0, frame.cols, frame.rows);
     const auto center = geometry::centerOf(rect);
     const auto centerH = geometry::Line_2(center, horizon);
@@ -34,12 +34,12 @@ geometry::Line_2 findCenter(const cv::Mat &frame, const MatchPoints &points, con
     const double ep = width / 10;
     std::cout << "Around center: " << ep << std::endl;
 
-    points.eachSpot([&](const Spot &spot) {
+    spots.eachSpot([&](const Spot &spot) {
         const auto p = spot.lastPoint();
         const auto d = sqrt(CGAL::squared_distance(centerV, p));
         if (ep < d) return;
 
-        const auto n = points.nearest(spot);
+        const auto n = spots.nearest(spot);
         if (!n) return;
         const auto neighbor = *n;
 
@@ -100,7 +100,7 @@ void CenterSlit::addFrame(const cv::Mat &frame) {
         const auto th = frame.cols / 100;
         std::cout << "Points movements (" << th << "): " << hvec << std::endl;
         if (th < sqrt(hvec.squared_length())) {
-            findCenter(frame, spots, hvec.direction());
+            findCenter(frame, hvec.direction());
         }
     }
     previous = current;
