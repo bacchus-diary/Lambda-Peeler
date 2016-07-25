@@ -39,7 +39,7 @@ int Spot::end() const {
     return startFrame + keypoints.size() - 1;
 }
 
-const geometry::Point_2 &Spot::lastPoint() const {
+const geometry::Point_2 &Spot::getLastPoint() const {
     return last;
 }
 
@@ -115,7 +115,7 @@ geometry::Vector_2 MatchPoints::movement() const {
 }
 
 boost::optional<Spot> MatchPoints::nearest(const Spot &spot) const {
-    const auto p = spot.lastPoint();
+    const auto p = spot.getLastPoint();
     const int frameIndex = spot.end();
 
     boost::optional<Spot> result;
@@ -137,6 +137,9 @@ void MatchPoints::eachSpot(const std::function<void(Spot)> func) const {
     for (auto s: spots) {
         func(s);
     }
+    eachCurrentSpot(func);
+}
+void MatchPoints::eachCurrentSpot(const std::function<void(Spot)> func) const {
     auto itr = indexedSpots.begin();
     while (itr != indexedSpots.end()) {
         func(itr->second);

@@ -11,6 +11,18 @@
 #include "../util/geometry.hpp"
 #include "match_points.hpp"
 
+class NeighborSpot {
+private:
+    Spot spotA, spotB;
+    geometry::Vector_2 aveDistance;
+    double changeRate;
+public:
+    NeighborSpot(const Spot &a, const Spot &b);
+
+    int getLastIndex();
+    geometry::Point_2 getLastPoint();
+};
+
 class CenterSlit {
 private:
     cv::Mat marged;

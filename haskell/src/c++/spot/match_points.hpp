@@ -28,7 +28,7 @@ public:
     int start() const;
     int end() const;
 
-    const geometry::Point_2 &lastPoint() const;
+    const geometry::Point_2 &getLastPoint() const;
     geometry::Vector_2 movement() const;
 
     void addPoint(const cv::KeyPoint &key);
@@ -47,6 +47,7 @@ public:
     geometry::Vector_2 movement() const;
     boost::optional<Spot> nearest(const Spot &spot) const;
     void eachSpot(const std::function<void(Spot)> func) const;
+    void eachCurrentSpot(const std::function<void(Spot)> func) const;
 };
 
 #endif

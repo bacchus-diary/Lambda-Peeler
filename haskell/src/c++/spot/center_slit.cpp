@@ -20,7 +20,50 @@ boost::optional<double> lengthOfIntersect(const geometry::Iso_rectangle_2 &rect,
     return result;
 }
 
+NeighborSpot::NeighborSpot(const Spot &a, const Spot &b): spotA(a), spotB(b) {
+    int frameIndex = getLastIndex();
+    const auto getPt = [&frameIndex](const Spot &s) {
+        boost::optional<geometry::Point_2> result;
+        const auto key = s.atFrame(frameIndex);
+        if (key) {
+            result = geometry::convert(key->pt);
+        }
+        return result;
+    };
+    geometry::Vector_2 va(0, 0);
+    std::vector<geometry::Vector_2> vs;
+    boost::optional<geometry::Point_2> ptA, ptB;
+    while ((ptA = getPt(spotA)) && (ptB = getPt(spotB))) {
+        const auto v = *ptB - *ptA;
+        va = va + v;
+        vs.push_back(v);
+        frameIndex--;
+    }
+    aveDistance = va / vs.size();
+
+    changeRate = pow(vs.front().squared_length() / vs.back().squared_length(), 0.5 / vs.size());
+
+    std::cout << "Changing rate of distance: " << changeRate << std::endl;
+}
+
+int NeighborSpot::getLastIndex() {
+    return spotA.end();
+}
+
+geometry::Point_2 NeighborSpot::getLastPoint() {
+    return spotA.getLastPoint();
+}
+
 geometry::Line_2 CenterSlit::findCenter(const cv::Mat &frame, const geometry::Direction_2 &horizon) {
+    std::vector<NeighborSpot> dist;
+    spots.eachCurrentSpot([&](const Spot &spot) {
+        const auto n = spots.nearest(spot);
+        if (!n) return;
+        const auto neighbor = *n;
+        dist.push_back(NeighborSpot(spot, neighbor));
+    });
+    std::cout << "Distributions of movement: " << dist.size() << std::endl;
+
     geometry::Iso_rectangle_2 rect(0, 0, frame.cols, frame.rows);
     const auto center = geometry::centerOf(rect);
     const auto centerH = geometry::Line_2(center, horizon);
@@ -34,38 +77,6 @@ geometry::Line_2 CenterSlit::findCenter(const cv::Mat &frame, const geometry::Di
     const double ep = width / 10;
     std::cout << "Around center: " << ep << std::endl;
 
-    spots.eachSpot([&](const Spot &spot) {
-        const auto p = spot.lastPoint();
-        const auto d = sqrt(CGAL::squared_distance(centerV, p));
-        if (ep < d) return;
-
-        const auto n = spots.nearest(spot);
-        if (!n) return;
-        const auto neighbor = *n;
-
-        int frameIndex = spot.end();
-        const auto getPt = [&frameIndex](const Spot &s) {
-            boost::optional<geometry::Point_2> result;
-            const auto key = s.atFrame(frameIndex);
-            if (key) {
-                result = geometry::convert(key->pt);
-            }
-            return result;
-        };
-        geometry::Vector_2 va(0, 0);
-        std::vector<geometry::Vector_2> vs;
-        boost::optional<geometry::Point_2> spt, npt;
-        while ((spt = getPt(spot)) && (npt = getPt(neighbor))) {
-            const auto v = *npt - *spt;
-            va = va + v;
-            vs.push_back(v);
-            frameIndex--;
-        }
-        va = va / vs.size();
-        const auto ma = (vs.front() - vs.back()) / vs.size();
-        geometry::Vector_2 mv(ma.x() / va.x(), ma.y() / va.y());
-        std::cout << "Average mv: " << mv << std::endl;
-    });
     return centerV;
 }
 
