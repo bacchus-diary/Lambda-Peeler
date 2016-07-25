@@ -4,6 +4,8 @@
 #include <iostream>
 #include <chrono>
 
+#include <levmar.h>
+
 #include "opencv2/core.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/opencv.hpp"
@@ -21,6 +23,8 @@ public:
 
     int getLastIndex();
     geometry::Point_2 getLastPoint();
+    double getChangeRate();
+    geometry::Vector_2 &getDistance();
 };
 
 class CenterSlit {
@@ -31,7 +35,7 @@ private:
     MatchPoints spots;
     int sizeOfFrame;
 
-    geometry::Line_2 findCenter(const cv::Mat &frame, const geometry::Direction_2 &horizon);
+    geometry::Line_2 findCenter();
 public:
     CenterSlit();
     void addFrame(const cv::Mat &frame);

@@ -54,7 +54,15 @@ geometry::Point_2 NeighborSpot::getLastPoint() {
     return spotA.getLastPoint();
 }
 
-geometry::Line_2 CenterSlit::findCenter(const cv::Mat &frame, const geometry::Direction_2 &horizon) {
+double NeighborSpot::getChangeRate() {
+    return changeRate;
+}
+
+geometry::Vector_2 &NeighborSpot::getDistance() {
+    return aveDistance;
+}
+
+geometry::Line_2 CenterSlit::findCenter() {
     std::vector<NeighborSpot> dist;
     spots.eachCurrentSpot([&](const Spot &spot) {
         const auto n = spots.nearest(spot);
@@ -64,19 +72,16 @@ geometry::Line_2 CenterSlit::findCenter(const cv::Mat &frame, const geometry::Di
     });
     std::cout << "Distributions of movement: " << dist.size() << std::endl;
 
-    geometry::Iso_rectangle_2 rect(0, 0, frame.cols, frame.rows);
-    const auto center = geometry::centerOf(rect);
-    const auto centerH = geometry::Line_2(center, horizon);
-    const auto centerV = centerH.perpendicular(center);
+    double p[] = {0.0, 0.0, 0.0};
+    dlevmar_dif([](double *p, double *hx, int m, int n, void *adata) {
+        std::vector<NeighborSpot> dist = *(std::vector<NeighborSpot> *)adata;
 
-    const auto w = lengthOfIntersect(rect, centerH);
-    if (!w) return centerV;
-    const double width = *w;
+        // TODO Calculate distance
 
-    std::cout << "Width: " << width << std::endl;
-    const double ep = width / 10;
-    std::cout << "Around center: " << ep << std::endl;
+    }, p, NULL, 3, 3, 300, NULL, NULL, NULL, NULL, &dist);
 
+    geometry::Line_2 centerV(p[0], p[1], p[2]);
+    std::cout << "Center Vertical Line: " << centerV << std::endl;
     return centerV;
 }
 
@@ -111,7 +116,7 @@ void CenterSlit::addFrame(const cv::Mat &frame) {
         const auto th = frame.cols / 100;
         std::cout << "Points movements (" << th << "): " << hvec << std::endl;
         if (th < sqrt(hvec.squared_length())) {
-            findCenter(frame, hvec.direction());
+            findCenter();
         }
     }
     previous = current;
