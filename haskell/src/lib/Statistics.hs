@@ -10,10 +10,9 @@ import Foreign.Marshal
 
 foreign export ccall hsAroundCenter :: CDouble -> CInt -> Ptr CDouble -> IO (Ptr CDouble)
 hsAroundCenter rate len srcArray = do
-    src <- fmap (map realToFrac) $ peekArray (fromIntegral len) srcArray
-    printf "Sorting src array: %d\n" (length src)
-    let dst = aroundCenter (realToFrac rate) src
-    newArray $ map realToFrac [fst dst, snd dst]
+    src <- peekArray (fromIntegral len) srcArray
+    let (a, b) = aroundCenter (realToFrac rate) (map realToFrac src)
+    newArray $ map realToFrac [a, b]
 
 aroundCenter :: Double -> [Double] -> (Double, Double)
 aroundCenter rate src =
@@ -24,13 +23,12 @@ aroundCenter rate src =
         sorted = sort src
         cv = sorted !! round(num / 2)
         diff v = abs(v / cv - 1)
-        interval d = (cv * (1 - d), cv * (1 + d))
-        count (a, b) = length $ filter (\v -> a <= v && v <= b) sorted
         check preGap preRate rate =
             if gap == 0 || preRate == rate
-                then t
+                then (minValue, maxValue)
                 else check gap rate $ rate + realToFrac(signum gap) * r * rate
             where
-                t = interval rate
-                gap = target - (count t)
+                (minValue, maxValue) = (cv * (1 - rate), cv * (1 + rate))
+                count = length $ filter (\v -> minValue <= v && v <= maxValue) sorted
+                gap = target - count
                 r = abs(preRate / rate - 1) / if gap * preGap < 0 then 10 else 1
