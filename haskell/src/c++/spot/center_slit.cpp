@@ -6,12 +6,6 @@ cv::BFMatcher matcher(feature->defaultNorm(), true);
 const auto COLOR_BLUE = cv::Scalar(255, 0, 0);
 const auto COLOR_RED = cv::Scalar(0, 0, 255);
 
-void writeImage(const cv::Mat &img, const std::string &name, const int index) {
-    std::stringstream path;
-    path << "resources/out/" << name << "-" << index << ".jpg";
-    cv::imwrite(path.str(), img);
-}
-
 boost::optional<double> lengthOfIntersect(const geometry::Iso_rectangle_2 &rect, const geometry::Line_2 &line) {
     boost::optional<double> result;
     auto ins = CGAL::intersection(rect, line);

@@ -2,7 +2,6 @@
 #define CENTER_SLIT_H
 
 #include <iostream>
-#include <sstream>
 #include <chrono>
 
 #include <levmar.h>
@@ -12,6 +11,7 @@
 #include "opencv2/opencv.hpp"
 
 #include "../util/geometry.hpp"
+#include "../util/images.hpp"
 #include "match_points.hpp"
 
 #include "Statistics_stub.h"
