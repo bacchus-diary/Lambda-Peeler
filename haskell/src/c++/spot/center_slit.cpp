@@ -76,25 +76,28 @@ geometry::Line_2 CenterSlit::findCenter(const cv::Mat &frame) {
 
         distTmp.push_back(NeighborSpot(spot, neighbor));
     });
-    const auto toValue = [](const NeighborSpot &ns) {
-        return sqrt(ns.getMovement().squared_length());
-    };
-    double tmpValues[distTmp.size()];
-    int index = 0;
-    for (auto ns: distTmp) {
-        tmpValues[index++] = toValue(ns);
-    }
-    const auto ac = (double*)hsAroundCenter(0.9, distTmp.size(), tmpValues);
-    std::cout << "Arround Center: " << ac[0] << ", " << ac[1] << std::endl;
-
     std::vector<NeighborSpot> dist;
-    for (auto ns: distTmp) {
-        const auto v = toValue(ns);
-        if (ac[0] <= v && v <= ac[1]) {
-            dist.push_back(ns);
+    if (distTmp.size() > 0) {
+        const auto toValue = [](const NeighborSpot &ns) {
+            return sqrt(ns.getMovement().squared_length());
+        };
+        double tmpValues[distTmp.size()];
+        int index = 0;
+        for (auto ns: distTmp) {
+            tmpValues[index++] = toValue(ns);
+        }
+        std::cout << "Filtering spots: " << distTmp.size() << std::endl;
+        const auto ac = (double*)hsAroundCenter(0.9, distTmp.size(), tmpValues);
+        std::cout << "Arround Center: " << ac[0] << ", " << ac[1] << std::endl;
 
-            const auto lp = ns.getLastPoint();
-            line(frame, geometry::convert(lp), geometry::convert(lp - ns.getMovement()), COLOR_BLUE, 2);
+        for (auto ns: distTmp) {
+            const auto v = toValue(ns);
+            if (ac[0] <= v && v <= ac[1]) {
+                dist.push_back(ns);
+
+                const auto lp = ns.getLastPoint();
+                line(frame, geometry::convert(lp), geometry::convert(lp - ns.getMovement()), COLOR_RED, 2);
+            }
         }
     }
     std::cout << "Sorted distributions of movement: " << dist.size() << std::endl;

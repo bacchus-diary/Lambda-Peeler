@@ -15,6 +15,7 @@ hsAroundCenter rate len srcArray = do
     newArray $ map realToFrac [a, b]
 
 aroundCenter :: Double -> [Double] -> (Double, Double)
+aroundCenter _ [] = (0, 0)
 aroundCenter rate src =
     check target 0.1 $ maximum [diff $ head sorted, diff $ last sorted]
     where
