@@ -1,8 +1,5 @@
 #include "center_slit.hpp"
 
-cv::Ptr<cv::Feature2D> feature = cv::AKAZE::create();
-cv::BFMatcher matcher(feature->defaultNorm(), true);
-
 const auto COLOR_BLUE = cv::Scalar(255, 0, 0);
 const auto COLOR_RED = cv::Scalar(0, 0, 255);
 
@@ -68,6 +65,13 @@ const geometry::Vector_2 &NeighborSpot::getMovement() const {
 }
 
 geometry::Line_2 CenterSlit::findCenter(const cv::Mat &frame) {
+    const auto startTime = std::chrono::system_clock::now();
+    const auto takeTime = [&startTime](const std::string &msg) {
+        const auto d = std::chrono::system_clock::now() - startTime;
+        const auto t = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+        std::cout << "CenterSlit::findCenter: " << t.count() << "ms" << " : " << msg << std::endl;
+    };
+
     std::vector<NeighborSpot> distTmp;
     spots.eachCurrentSpot([&](const Spot &spot) {
         const auto n = spots.nearest(spot);
@@ -101,6 +105,7 @@ geometry::Line_2 CenterSlit::findCenter(const cv::Mat &frame) {
         }
     }
     std::cout << "Sorted distributions of movement: " << dist.size() << std::endl;
+    takeTime("Sorted distributions.");
 
     double p[] = {1.0, 0.0, -(frame.cols / 2.0)};
     dlevmar_dif([](double *p, double *hx, int m, int n, void *adata) {
@@ -133,13 +138,14 @@ geometry::Line_2 CenterSlit::findCenter(const cv::Mat &frame) {
         hx[2] = h2;
         return;
     }, p, NULL, 3, 3, 300, NULL, NULL, NULL, NULL, &dist);
+    takeTime("Found center line.");
 
     geometry::Line_2 centerV(p[0], p[1], p[2]);
     std::cout << "Center Vertical Line: " << centerV << std::endl;
     return centerV;
 }
 
-CenterSlit::CenterSlit(): spots(matcher), moved(0, 0), sizeOfFrame(0) {
+CenterSlit::CenterSlit(): spots(), moved(0, 0), sizeOfFrame(0) {
     std::cout << "Initializing empty CenterSlit..." << std::endl;
 }
 
@@ -156,31 +162,23 @@ void CenterSlit::addFrame(const cv::Mat &frame) {
     };
 
     printf("Detecting points at frame[%d]\n", sizeOfFrame);
-    Detected current;
-    current.detectAndCompute(frame, feature);
+    CapturedFrame current(frame);
     takeTime("Detected.");
-    std::cout << "Detected keypoints=" << current.keypoints.size() << std::endl;
-    if (previous.desc.rows < 1) {
+    if (previous.isEmpty()) {
         margedFrame = frame;
     } else {
         spots.match(previous, current);
         takeTime("Matched.");
-        const auto hvec = spots.movement();
-        takeTime("Took movement.");
-        const auto th = frame.cols / 1000;
-        std::cout << "Points movements (" << th << "): " << hvec << std::endl;
-        if (th < sqrt(hvec.squared_length())) {
-            const auto line = findCenter(frame);
-            geometry::Iso_rectangle_2 rect(0, 0, frame.cols, frame.rows);
-            const auto ins = CGAL::intersection(rect, line);
-            if (ins) {
-                if (const geometry::Segment_2* s = boost::get<geometry::Segment_2>(&*ins)) {
-                    const auto a = geometry::convert(s->source());
-                    const auto b = geometry::convert(s->target());
-                    std::cout << "Line: from " << a << " to " << b << std::endl;
-                    cv::line(frame, a, b, COLOR_RED, 2);
-                    writeImage(frame, "lined", sizeOfFrame);
-                }
+        const auto line = findCenter(frame);
+        geometry::Iso_rectangle_2 rect(0, 0, frame.cols, frame.rows);
+        const auto ins = CGAL::intersection(rect, line);
+        if (ins) {
+            if (const geometry::Segment_2* s = boost::get<geometry::Segment_2>(&*ins)) {
+                const auto a = geometry::convert(s->source());
+                const auto b = geometry::convert(s->target());
+                std::cout << "Line: from " << a << " to " << b << std::endl;
+                cv::line(frame, a, b, COLOR_BLUE, 2);
+                writeImage(frame, "lined", sizeOfFrame);
             }
         }
     }

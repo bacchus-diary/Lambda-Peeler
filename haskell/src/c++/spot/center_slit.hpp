@@ -40,7 +40,7 @@ public:
 class CenterSlit {
 private:
     cv::Mat margedFrame;
-    Detected previous;
+    CapturedFrame previous;
     cv::Vec2d moved;
     MatchPoints spots;
     int sizeOfFrame;

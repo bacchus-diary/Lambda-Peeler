@@ -1,28 +1,53 @@
 #include "match_points.hpp"
 
-void Detected::detectAndCompute(const cv::Mat &frame, const cv::Ptr<cv::Feature2D> &feature) {
-    const auto startTime = std::chrono::system_clock::now();
-    const auto takeTime = [&startTime](const std::string &msg) {
-        const auto d = std::chrono::system_clock::now() - startTime;
-        const auto t = std::chrono::duration_cast<std::chrono::milliseconds>(d);
-        std::cout << "Detected::detectAndCompute: " << t.count() << "ms" << " : " << msg << std::endl;
-    };
+cv::Ptr<cv::Feature2D> feature = cv::AKAZE::create();
+cv::BFMatcher matcher(feature->defaultNorm(), true);
+
+CapturedFrame::CapturedFrame() {
+    std::cout << "Created empty CapturedFrame." << std::endl;
+}
+
+CapturedFrame::CapturedFrame(const cv::Mat &frame) {
+    originalFrame = frame;
+    getContoured();
+    writeImage(contouredFrame, "contoured");
 
     std::vector<cv::KeyPoint> tmpVec;
-
-    feature->detect(frame, tmpVec);
-    takeTime("Detected.");
-    std::cout << "Reducing keypoints=" << tmpVec.size() << std::endl;
-
+    feature->detect(contouredFrame, tmpVec);
+    std::cout << "Reducing keypoints: " << tmpVec.size() << std::endl;
     for (auto key: tmpVec) {
         if (1 < key.octave) {
-            keypoints.push_back(key);
+            detected.keypoints.push_back(key);
         }
     }
-    takeTime("Reduced.");
+    std::cout << "Computing keypoints: " << detected.keypoints.size() << std::endl;
+    feature->compute(contouredFrame, detected.keypoints, detected.desc);
+}
 
-    feature->compute(frame, keypoints, desc);
-    takeTime("Computed.");
+bool CapturedFrame::isEmpty() {
+    return originalFrame.rows == 0;
+}
+
+void CapturedFrame::getContoured() {
+    const int cannyThresh = 100;
+    const auto blurSize = cv::Size(3, 3);
+    const auto contoursBG = cv::Scalar(0);
+    const auto contoursFG = cv::Scalar(255);
+
+    cv::Mat grayFrame, edgedFrame;
+    cv::cvtColor(originalFrame, grayFrame, cv::COLOR_BGR2GRAY);
+    cv::blur(grayFrame, grayFrame, blurSize);
+    cv::Canny(grayFrame, edgedFrame, cannyThresh, cannyThresh * 2);
+
+    std::vector<std::vector<cv::Point> > contours;
+    std::vector<cv::Vec4i> hierarchy;
+    cv::findContours(edgedFrame, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
+    std::cout << "Found contours: " << contours.size() << std::endl;
+
+    contouredFrame = cv::Mat(grayFrame.size(), grayFrame.type(), contoursBG);
+    for (int i = 0; i >= 0; i = hierarchy[i][0]) {
+        cv::drawContours(contouredFrame, contours, i, contoursFG);
+    }
 }
 
 Spot::Spot(const int startIndex, const cv::KeyPoint &key) {
@@ -60,15 +85,14 @@ boost::optional<cv::KeyPoint> Spot::atFrame(const int index) const {
     return result;
 }
 
-MatchPoints::MatchPoints(const cv::BFMatcher &_matcher) {
+MatchPoints::MatchPoints() {
     index = 0;
-    matcher = _matcher;
 }
 
-void MatchPoints::match(const Detected &previous, const Detected &current) {
+void MatchPoints::match(const CapturedFrame &previous, const CapturedFrame &current) {
     index++;
     std::vector<cv::DMatch> matches;
-    matcher.match(previous.desc, current.desc, matches);
+    matcher.match(previous.detected.desc, current.detected.desc, matches);
 
     const auto findSpot = [&](const int preIndex) {
         auto found = indexedSpots.find(preIndex);
@@ -77,14 +101,14 @@ void MatchPoints::match(const Detected &previous, const Detected &current) {
             indexedSpots.erase(found);
             return result;
         } else {
-            return Spot(index, previous.keypoints[preIndex]);
+            return Spot(index, previous.detected.keypoints[preIndex]);
         }
     };
 
     std::map<int, Spot> next;
     for (auto m: matches) {
         auto found = findSpot(m.queryIdx);
-        found.addPoint(current.keypoints[m.trainIdx]);
+        found.addPoint(current.detected.keypoints[m.trainIdx]);
         next.insert(std::make_pair(m.trainIdx, found));
     }
     std::cout << "Matched spots: " << next.size() << std::endl;
@@ -95,23 +119,6 @@ void MatchPoints::match(const Detected &previous, const Detected &current) {
     }
     std::cout << "Add passed spots: " << indexedSpots.size() << std::endl;
     indexedSpots = next;
-}
-
-geometry::Vector_2 MatchPoints::movement() const {
-    int total = 0;
-    double x = 0, y = 0;
-    if (!spots.empty() || !indexedSpots.empty()) {
-        eachSpot([&](const Spot &s) {
-            const auto m = s.movement();
-            x += m.x();
-            y += m.y();
-            total++;
-        });
-        x /= total;
-        y /= total;
-    }
-    std::cout << "Ave of movements (" << total << "): " << x << ", " << y << std::endl;
-    return geometry::Vector_2(x, y);
 }
 
 boost::optional<Spot> MatchPoints::nearest(const Spot &spot) const {

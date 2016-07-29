@@ -8,13 +8,22 @@
 #include <opencv2/opencv.hpp>
 
 #include "../util/geometry.hpp"
+#include "../util/images.hpp"
 
-class Detected {
-public:
+struct Detected {
     std::vector<cv::KeyPoint> keypoints;
     cv::Mat desc;
+};
 
-    void detectAndCompute(const cv::Mat &frame, const cv::Ptr<cv::Feature2D> &feature);
+class CapturedFrame {
+private:
+    cv::Mat originalFrame, contouredFrame;
+    void getContoured();
+public:
+    Detected detected;
+    CapturedFrame();
+    CapturedFrame(const cv::Mat &frame);
+    bool isEmpty();
 };
 
 class Spot {
@@ -38,12 +47,11 @@ public:
 class MatchPoints {
 private:
     int index;
-    cv::BFMatcher matcher;
     std::vector<Spot> spots;
     std::map<int, Spot> indexedSpots;
 public:
-    MatchPoints(const cv::BFMatcher &_matcher);
-    void match(const Detected &previous, const Detected &current);
+    MatchPoints();
+    void match(const CapturedFrame &previous, const CapturedFrame &current);
     geometry::Vector_2 movement() const;
     boost::optional<Spot> nearest(const Spot &spot) const;
     void eachSpot(const std::function<void(Spot)> func) const;
