@@ -17,7 +17,7 @@
 #include <CGAL/Aff_transformation_2.h>
 #include <CGAL/intersections.h>
 
-#include "opencv2/core.hpp"
+#include <opencv2/core.hpp>
 
 namespace geometry {
     typedef CGAL::Cartesian<double> K;

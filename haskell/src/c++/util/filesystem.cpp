@@ -1,11 +1,4 @@
-#include <iostream>
-#include <sstream>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <libgen.h>
-
-using namespace std;
+#include "filesystem.hpp"
 
 void mkParents(char *path, mode_t mode) {
     char dm[sizeof(path)];
@@ -20,7 +13,7 @@ void mkParents(char *path, mode_t mode) {
     } else if (S_ISDIR(info.st_mode)) {
         return;
     } else {
-        cout << "Already exists as a file: " << dir << endl;
+        std::cout << "Already exists as a file: " << dir << std::endl;
         return;
     }
 }
