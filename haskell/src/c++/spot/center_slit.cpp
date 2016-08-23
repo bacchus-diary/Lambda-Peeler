@@ -242,7 +242,7 @@ void CenterSlit::marge(const geometry::Line_2 &center, const cv::Mat &frame) {
     cv::Mat cropDst(nextMarged, cv::Range::all(), rangeX);
     cropSrc.copyTo(cropDst);
 
-    if (moveY > 0) baseline = baseline + moveY;
+    baseline = std::max(0, baseline + moveY);
 
     for (int dstY = 0; dstY < sizeY; ++dstY) {
         for (int dstX = sizeX - frame.cols; dstX < sizeX; ++dstX) {
