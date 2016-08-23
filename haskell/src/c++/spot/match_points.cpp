@@ -1,19 +1,45 @@
 #include "match_points.hpp"
 
-cv::Ptr<cv::Feature2D> feature = cv::AKAZE::create();
-cv::BFMatcher matcher(feature->defaultNorm(), true);
+const auto feature = cv::ORB::create();
+const cv::BFMatcher matcher(feature->defaultNorm(), true);
 
-CapturedFrame::CapturedFrame() {
-    std::cout << "Created empty CapturedFrame." << std::endl;
+void getContoured(const cv::Mat &src, cv::Mat &target) {
+    cv::Mat grayFrame;
+    cv::cvtColor(src, grayFrame, cv::COLOR_BGR2GRAY);
+
+    const auto sobel = [&]() {
+        cv::Mat tmp;
+        cv::Sobel(grayFrame, tmp, CV_64F, 1, 1);
+        cv::convertScaleAbs(tmp, target, 1, 0);
+    };
+    const auto laplacian = [&]() {
+        cv::Mat tmp;
+        cv::Laplacian(grayFrame, tmp, CV_64F, 3);
+        cv::convertScaleAbs(tmp, target, 1, 0);
+    };
+    const auto canny = [&]() {
+        cv::Mat tmp;
+        cv::blur(grayFrame, tmp, cv::Size(3, 3));
+        cv::Canny(tmp, target, 50, 200);
+    };
+    const auto unsharp = [&]() {
+        cv::Mat tmp;
+        cv::GaussianBlur(src, tmp, cv::Size(21, 21), 20.0);
+        cv::addWeighted(src, 2, tmp, -1, 0, target);
+    };
+    const auto rough = [&]() {
+        cv::Mat tmp, tmp2;
+        cv::blur(grayFrame, tmp, cv::Size(30, 30));
+        cv::GaussianBlur(tmp, tmp2, cv::Size(21, 21), 20);
+        cv::addWeighted(tmp, 2.0, tmp2, -1.0, 0, target);
+    };
+
+    unsharp();
 }
 
-CapturedFrame::CapturedFrame(const cv::Mat &frame) {
-    originalFrame = frame;
-    getContoured();
-    writeImage(contouredFrame, "contoured");
-
+void detectAndCompute(const cv::Mat &img, Detected &detected) {
     std::vector<cv::KeyPoint> tmpVec;
-    feature->detect(contouredFrame, tmpVec);
+    feature->detect(img, tmpVec);
     std::cout << "Reducing keypoints: " << tmpVec.size() << std::endl;
     for (auto key: tmpVec) {
         if (1 < key.octave) {
@@ -21,38 +47,38 @@ CapturedFrame::CapturedFrame(const cv::Mat &frame) {
         }
     }
     std::cout << "Computing keypoints: " << detected.keypoints.size() << std::endl;
-    feature->compute(contouredFrame, detected.keypoints, detected.desc);
+    feature->compute(img, detected.keypoints, detected.desc);
+}
+
+void matchDescs(const Detected &a, const Detected &b, std::vector<cv::DMatch> *matches) {
+    std::vector<cv::DMatch> tmp;
+    matcher.match(a.desc, b.desc, tmp);
+    std::cout << "Reducing matches: " << tmp.size() << std::endl;
+    for (auto m: tmp) {
+        if (m.distance < 50) {
+            matches->push_back(m);
+        }
+    }
+    std::cout << "Finish discriptors match: " << matches->size() << std::endl;
+}
+
+CapturedFrame::CapturedFrame() {
+    std::cout << "Created empty CapturedFrame." << std::endl;
+}
+
+CapturedFrame::CapturedFrame(const cv::Mat &frame): originalFrame(frame) {
+    getContoured(originalFrame, contouredFrame);
+    writeImage(contouredFrame, "contoured");
+    detectAndCompute(contouredFrame, detected);
 }
 
 bool CapturedFrame::isEmpty() {
     return originalFrame.rows == 0;
 }
 
-void CapturedFrame::getContoured() {
-    const int cannyThresh = 100;
-    const auto blurSize = cv::Size(3, 3);
-    const auto contoursBG = cv::Scalar(0);
-    const auto contoursFG = cv::Scalar(255);
-
-    cv::Mat grayFrame, edgedFrame;
-    cv::cvtColor(originalFrame, grayFrame, cv::COLOR_BGR2GRAY);
-    cv::blur(grayFrame, grayFrame, blurSize);
-    cv::Canny(grayFrame, edgedFrame, cannyThresh, cannyThresh * 2);
-
-    std::vector<std::vector<cv::Point> > contours;
-    std::vector<cv::Vec4i> hierarchy;
-    cv::findContours(edgedFrame, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE);
-    std::cout << "Found contours: " << contours.size() << std::endl;
-
-    contouredFrame = cv::Mat(grayFrame.size(), grayFrame.type(), contoursBG);
-    for (int i = 0; i >= 0; i = hierarchy[i][0]) {
-        cv::drawContours(contouredFrame, contours, i, contoursFG);
-    }
-}
-
 Spot::Spot(const int startIndex, const cv::KeyPoint &key) {
     startFrame = startIndex - 1;
-    addPoint(key);
+    addPoint(key, 0);
     first = last;
 }
 
@@ -64,23 +90,50 @@ int Spot::end() const {
     return startFrame + keypoints.size() - 1;
 }
 
+int Spot::size() const {
+    return keypoints.size();
+}
+
 const geometry::Point_2 &Spot::getLastPoint() const {
     return last;
 }
 
-geometry::Vector_2 Spot::movement() const {
-    return last - first;
+geometry::Vector_2 Spot::getAveMovement(int c) const {
+    const int size = keypoints.size();
+    if (c < 1) {
+        c = size;
+    } else {
+        c = std::min(size, c);
+    }
+    const auto since = geometry::convert(keypoints[size - c].pt);
+    return (last - since) / c;
 }
 
-void Spot::addPoint(const cv::KeyPoint &key) {
+double Spot::getAveDistance(int c) const {
+    const int size = distances.size();
+    if (c < 1) {
+        c = size;
+    } else {
+        c = std::min(size, c);
+    }
+    double sum = 0;
+    for (int i = size - c; i < size; i++) {
+        sum += distances[i];
+    }
+    return sum / c;
+}
+
+void Spot::addPoint(const cv::KeyPoint &key, const double distance) {
     keypoints.push_back(key);
+    distances.push_back(distance);
     last = geometry::convert(key.pt);
 }
 
-boost::optional<cv::KeyPoint> Spot::atFrame(const int index) const {
-    boost::optional<cv::KeyPoint> result;
+boost::optional<std::pair<cv::KeyPoint, double> > Spot::atFrame(const int index) const {
+    boost::optional<std::pair<cv::KeyPoint, double> > result;
     if (start() <= index && index <= end()) {
-        result = keypoints[index - start()];
+        const auto i = index - start();
+        result = std::make_pair(keypoints[i], distances[i]);
     }
     return result;
 }
@@ -92,7 +145,7 @@ MatchPoints::MatchPoints() {
 void MatchPoints::match(const CapturedFrame &previous, const CapturedFrame &current) {
     index++;
     std::vector<cv::DMatch> matches;
-    matcher.match(previous.detected.desc, current.detected.desc, matches);
+    matchDescs(previous.detected, current.detected, &matches);
 
     const auto findSpot = [&](const int preIndex) {
         auto found = indexedSpots.find(preIndex);
@@ -108,7 +161,7 @@ void MatchPoints::match(const CapturedFrame &previous, const CapturedFrame &curr
     std::map<int, Spot> next;
     for (auto m: matches) {
         auto found = findSpot(m.queryIdx);
-        found.addPoint(current.detected.keypoints[m.trainIdx]);
+        found.addPoint(current.detected.keypoints[m.trainIdx], m.distance);
         next.insert(std::make_pair(m.trainIdx, found));
     }
     std::cout << "Matched spots: " << next.size() << std::endl;
@@ -130,7 +183,7 @@ boost::optional<Spot> MatchPoints::nearest(const Spot &spot) const {
     eachSpot([&](const Spot &s) {
         const auto key = s.atFrame(frameIndex);
         if (key) {
-            const double od = CGAL::squared_distance(p, geometry::convert(key->pt));
+            const double od = CGAL::squared_distance(p, geometry::convert(key->first.pt));
             if (d < 0 || od != 0 && od < d) {
                 result = s;
                 d = od;
