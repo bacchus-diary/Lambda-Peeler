@@ -206,3 +206,7 @@ void MatchPoints::eachCurrentSpot(const std::function<void(Spot)> func) const {
         ++itr;
     }
 }
+
+int MatchPoints::sizeCurrent() const {
+    return indexedSpots.size();
+}

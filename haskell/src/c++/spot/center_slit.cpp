@@ -219,17 +219,36 @@ void CenterSlit::addFrame(const cv::Mat &frame) {
     takeTime("Finish.");
 }
 
-void CenterSlit::marge(const geometry::Line_2 &center, const cv::Mat &frame) {
-    std::vector<NeighborSpot> dist;
-    nearestNeighbor(&dist);
+geometry::Vector_2 CenterSlit::averageMovements(const double rate) const {
+    double tmpDistances[spots.sizeCurrent()];
+    int index = 0;
+    spots.eachCurrentSpot([&](const Spot &spot) {
+        const auto m = spot.getAveMovement(blockSize);
+        tmpDistances[index++] = m.squared_length();
+    });
+
+    std::cout << "Filtering spots: " << spots.sizeCurrent() << std::endl;
+    const auto ac = (double*)hsAroundCenter(rate, spots.sizeCurrent(), tmpDistances);
+    std::cout << "Arround Center: " << ac[0] << ", " << ac[1] << std::endl;
+
     geometry::Vector_2 total(0, 0);
-    for (auto ns: dist) {
-        total = total + ns.getAveMovement(blockSize);
-    }
-    total = total / dist.size();
-    std::cout << "Average of movements: " << sqrt(total.squared_length()) << std::endl;
-    const int moveX = total.x();
-    const int moveY = total.y();
+    int count = 0;
+    spots.eachCurrentSpot([&](const Spot &spot) {
+        const auto m = spot.getAveMovement(blockSize);
+        const auto d = m.squared_length();
+        if (ac[0] <= d && d <= ac[1]) {
+            total = total + m;
+            count++;
+        }
+    });
+    return total / count;
+}
+
+void CenterSlit::marge(const geometry::Line_2 &center, const cv::Mat &frame) {
+    const auto am = averageMovements(0.9);
+    std::cout << "Average of movements: " << am << std::endl;
+    const int moveX = am.x();
+    const int moveY = am.y();
 
     const auto sizeX = margedFrame.cols - moveX;
     const auto sizeY = margedFrame.rows - abs(moveY);

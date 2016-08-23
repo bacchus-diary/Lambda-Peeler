@@ -53,6 +53,7 @@ private:
     geometry::Line_2 findCenter(const cv::Mat &frame);
     void marge(const geometry::Line_2 &center, const cv::Mat &frame);
     void nearestNeighbor(std::vector<NeighborSpot> *dist, const std::function<bool(Spot)> pref = NULL);
+    geometry::Vector_2 averageMovements(const double rate) const;
 public:
     const int blockSize = 20;
     CenterSlit();

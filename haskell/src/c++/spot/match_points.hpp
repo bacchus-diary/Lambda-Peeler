@@ -57,6 +57,7 @@ public:
     boost::optional<Spot> nearest(const Spot &spot) const;
     void eachSpot(const std::function<void(Spot)> func) const;
     void eachCurrentSpot(const std::function<void(Spot)> func) const;
+    int sizeCurrent() const;
 };
 
 #endif
