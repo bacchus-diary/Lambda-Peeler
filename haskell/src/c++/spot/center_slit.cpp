@@ -219,33 +219,37 @@ void CenterSlit::addFrame(const cv::Mat &frame) {
     takeTime("Finish.");
 }
 
-geometry::Vector_2 CenterSlit::averageMovements(const double rate) const {
-    double tmpDistances[spots.sizeCurrent()];
-    int index = 0;
-    spots.eachCurrentSpot([&](const Spot &spot) {
-        const auto m = spot.getAveMovement(blockSize);
-        tmpDistances[index++] = m.squared_length();
-    });
-
-    std::cout << "Filtering spots: " << spots.sizeCurrent() << std::endl;
-    const auto ac = (double*)hsAroundCenter(rate, spots.sizeCurrent(), tmpDistances);
-    std::cout << "Arround Center: " << ac[0] << ", " << ac[1] << std::endl;
-
-    geometry::Vector_2 total(0, 0);
-    int count = 0;
-    spots.eachCurrentSpot([&](const Spot &spot) {
-        const auto m = spot.getAveMovement(blockSize);
-        const auto d = m.squared_length();
-        if (ac[0] <= d && d <= ac[1]) {
-            total = total + m;
-            count++;
-        }
-    });
-    return total / count;
-}
-
 void CenterSlit::marge(const geometry::Line_2 &center, const cv::Mat &frame) {
-    const auto am = averageMovements(0.9);
+    const auto averageMovements = [&]() {
+        std::vector<geometry::Vector_2> tmpList;
+        const auto thresh = pow(frame.cols / 10, 2);
+        spots.eachCurrentSpot([&](const Spot &spot) {
+            if (CGAL::squared_distance(center, spot.getLastPoint()) < thresh) {
+                tmpList.push_back(spot.getAveMovement(blockSize));
+            }
+        });
+        double tmpDistances[tmpList.size()];
+        int index = 0;
+        for (const auto m: tmpList) {
+            tmpDistances[index++] = m.squared_length();
+        }
+
+        std::cout << "Filtering spots: " << tmpList.size() << std::endl;
+        const auto ac = (double*)hsAroundCenter(0.9, tmpList.size(), tmpDistances);
+        std::cout << "Arround Center: " << ac[0] << ", " << ac[1] << std::endl;
+
+        geometry::Vector_2 total(0, 0);
+        int count = 0;
+        for (const auto m: tmpList) {
+            const auto d = m.squared_length();
+            if (ac[0] <= d && d <= ac[1]) {
+                total = total + m;
+                count++;
+            }
+        }
+        return total / count;
+    };
+    const auto am = averageMovements();
     std::cout << "Average of movements: " << am << std::endl;
     const int moveX = am.x();
     const int moveY = am.y();
